@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Caddxpert AI Assistant — Widget Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Core Variables ── */
+    :root {
+      --cx-red: #E31E24;
+      --cx-red-hover: #c41318;
+      --cx-dark: #1C1C1C;
+      --cx-dark-light: #2e2e2e;
+      --cx-gray-bg: #f7f7f7;
+      --cx-border: #e8e8e8;
+      --cx-text-primary: #1C1C1C;
+      --cx-text-secondary: #666666;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cx-gray-bg);
+      color: var(--cx-text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: var(--cx-dark);
+      height: 62px;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+    }
+    .nav-logo-box {
+      width: 36px;
+      height: 36px;
+      background: var(--cx-red);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    .nav-brand { color: white; font-weight: 700; font-size: 16px; }
+    .nav-sub { color: rgba(255,255,255,0.45); font-size: 11px; margin-top: 1px; }
+    .nav-pill {
+      background: rgba(227,30,36,0.15);
+      border: 1px solid rgba(227,30,36,0.35);
+      border-radius: 20px;
+      padding: 5px 16px;
+      color: var(--cx-red);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--cx-dark) 0%, var(--cx-dark-light) 100%);
+      padding: 80px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: rgba(227,30,36,0.1);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -40px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(227,30,36,0.07);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(227,30,36,0.15);
+      border: 1px solid rgba(227,30,36,0.4);
+      border-radius: 20px;
+      padding: 6px 18px;
+      color: var(--cx-red);
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 22px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      color: white;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .hero h1 em { color: var(--cx-red); font-style: normal; }
+    .hero p {
+      color: rgba(255,255,255,0.55);
+      font-size: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ── Content ── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 56px 24px 100px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cx-text-primary);
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 20px;
+      background: var(--cx-red);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Feature Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 52px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      border: 1.5px solid var(--cx-border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .card-icon { font-size: 28px; margin-bottom: 12px; }
+    .card h3 { font-size: 14.5px; font-weight: 700; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: var(--cx-text-secondary); line-height: 1.5; }
+
+    /* Code block */
+    .code-wrap {
+      background: var(--cx-dark);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 52px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    }
+    .code-bar {
+      background: var(--cx-dark-light);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .code-dots { display: flex; gap: 6px; }
+    .code-dots span { width: 12px; height: 12px; border-radius: 50%; }
+    .code-dots span:nth-child(1) { background: #ff5f56; }
+    .code-dots span:nth-child(2) { background: #ffbd2e; }
+    .code-dots span:nth-child(3) { background: #27c93f; }
+    .code-label { color: #888; font-size: 12px; font-family: monospace; }
+    .code-wrap pre {
+      padding: 22px 26px;
+      font-size: 13.5px;
+      font-family: 'Fira Code', Consolas, monospace;
+      line-height: 1.75;
+      overflow-x: auto;
+      color: #e0e0e0;
+    }
+    .code-wrap .r { color: #ff8080; }
+    .code-wrap .g { color: #80d980; }
+    .code-wrap .y { color: #ffd080; }
+    .code-wrap .d { color: #888; font-style: italic; }
+
+    /* Tip box */
+    .tip {
+      background: white;
+      border: 1.5px solid var(--cx-border);
+      border-left: 4px solid var(--cx-red);
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .tip-icon { font-size: 22px; flex-shrink: 0; }
+    .tip p { font-size: 13.5px; color: #444; line-height: 1.65; }
+    .tip code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-family: monospace;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--cx-dark);
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+    }
+    footer strong { color: var(--cx-red); }
+
+    /* ─── CHAT WIDGET STYLES ─── */
+    .cx-widget-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Bubble Launcher */
+    .cx-launcher {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cx-red) 0%, #b81419 100%);
+      box-shadow: 0 4px 20px rgba(227, 30, 36, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+      border: none;
+      outline: none;
+      position: relative;
+    }
+    .cx-launcher:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 24px rgba(227, 30, 36, 0.5);
+    }
+    .cx-launcher:active {
+      transform: scale(0.95);
+    }
+    .cx-launcher svg {
+      width: 26px;
+      height: 26px;
+      fill: white;
+      transition: transform 0.3s ease, opacity 0.2s;
+    }
+    .cx-launcher .cx-icon-close {
+      position: absolute;
+      opacity: 0;
+      transform: rotate(-45deg) scale(0.8);
+    }
+    .cx-launcher.open .cx-icon-chat {
+      opacity: 0;
+      transform: rotate(45deg) scale(0.8);
+    }
+    .cx-launcher.open .cx-icon-close {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    /* Notification Badge */
+    .cx-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      background: #27c93f;
+      border: 2px solid white;
+      border-radius: 50%;
+      animation: cx-pulse 2s infinite;
+    }
+
+    /* Launcher Tooltip */
+    .cx-launcher-tooltip {
+      position: absolute;
+      right: 76px;
+      bottom: 10px;
+      background: white;
+      border: 1px solid var(--cx-border);
+      border-radius: 12px;
+      padding: 10px 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--cx-text-primary);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 1;
+      transform: translateX(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cx-launcher-tooltip.hidden {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    .cx-tooltip-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--cx-red);
+      border-radius: 50%;
+    }
+
+    /* Chat Panel */
+    .cx-chat-panel {
+      position: absolute;
+      bottom: 76px;
+      right: 0;
+      width: 400px;
+      height: 600px;
+      max-height: calc(100vh - 120px);
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cx-chat-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    /* Panel Header */
+    .cx-header {
+      background: var(--cx-dark);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--cx-red);
+      flex-shrink: 0;
+    }
+    .cx-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .cx-header-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--cx-red);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: white;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+    .cx-header-meta {
+      display: flex;
+      flex-direction: column;
+    }
+    .cx-header-title {
+      color: white;
+      font-weight: 700;
+      font-size: 14.5px;
+      line-height: 1.2;
+    }
+    .cx-header-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 3px;
+    }
+    .cx-status-dot {
+      width: 7px;
+      height: 7px;
+      background: #27c93f;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(39,201,63,0.2);
+    }
+    .cx-header-actions button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.6);
+      padding: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cx-header-actions button:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    /* Message Area */
+    .cx-body {
+      flex: 1;
+      padding: 20px 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #FAFAFA;
+      scroll-behavior: smooth;
+    }
+
+    .cx-body::-webkit-scrollbar { width: 4px; }
+    .cx-body::-webkit-scrollbar-track { background: transparent; }
+    .cx-body::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    /* Chat Bubbles */
+    .cx-msg-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 84%;
+      animation: cx-fade-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .cx-msg-wrapper.bot { align-self: flex-start; }
+    .cx-msg-wrapper.user { align-self: flex-end; }
+
+    .cx-msg-bubble {
+      padding: 13px 16px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .bot .cx-msg-bubble {
+      background: white;
+      color: var(--cx-text-primary);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .user .cx-msg-bubble {
+      background: var(--cx-dark);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .cx-msg-timestamp {
+      font-size: 10.5px;
+      color: #aaa;
+      margin-top: 5px;
+      margin-left: 4px;
+    }
+    .user .cx-msg-timestamp {
+      align-self: flex-end;
+      margin-right: 4px;
+    }
+
+    /* Markdown Styling in Bot Bubbles */
+    .bot .cx-msg-bubble strong, .bot .cx-msg-bubble b {
+      font-weight: 700;
+      color: #111;
+    }
+    .bot .cx-msg-bubble h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cx-red);
+      margin: 10px 0 5px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .bot .cx-msg-bubble h3:first-child { margin-top: 0; }
+    .bot .cx-msg-bubble h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #333;
+      margin: 8px 0 4px;
+    }
+    .bot .cx-msg-bubble p {
+      margin: 5px 0;
+    }
+    .bot .cx-msg-bubble p:first-child { margin-top: 0; }
+    .bot .cx-msg-bubble p:last-child  { margin-bottom: 0; }
+    .bot .cx-msg-bubble ul {
+      margin: 8px 0 6px 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .bot .cx-msg-bubble li {
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .bot .cx-msg-bubble li::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cx-red);
+    }
+
+    /* Typing Indicator */
+    .cx-typing-bubble {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 13px 18px;
+      background: white;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.06);
+      width: fit-content;
+      align-self: flex-start;
+      animation: cx-fade-slide 0.25s ease;
+    }
+    .cx-typing-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--cx-red);
+      border-radius: 50%;
+      animation: cx-bounce 1.4s infinite ease-in-out both;
+    }
+    .cx-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .cx-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    /* Action CTA Card */
+    .cx-cta-card {
+      background: linear-gradient(135deg, #FFF8F8 0%, #FFF1F1 100%);
+      border: 1px solid rgba(227, 30, 36, 0.15);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(227, 30, 36, 0.04);
+      align-self: flex-start;
+      max-width: 90%;
+      animation: cx-fade-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .cx-cta-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--cx-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cx-cta-desc {
+      font-size: 12.5px;
+      color: #555;
+      line-height: 1.55;
+    }
+    .cx-cta-btn {
+      background: var(--cx-red);
+      color: white !important;
+      border: none;
+      border-radius: 9px;
+      padding: 9px 16px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      text-align: center;
+      display: inline-block;
+      text-decoration: none !important;
+      box-shadow: 0 2px 8px rgba(227,30,36,0.3);
+      align-self: flex-start;
+    }
+    .cx-cta-btn:hover {
+      background: var(--cx-red-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(227,30,36,0.4);
+    }
+
+    /* Quick Action Chips */
+    .cx-chips-container {
+      padding: 10px 16px 12px;
+      background: white;
+      border-top: 1px solid var(--cx-border);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scroll-behavior: smooth;
+      flex-shrink: 0;
+    }
+    .cx-chips-container::-webkit-scrollbar { display: none; }
+    .cx-chip {
+      background: #f4f4f4;
+      border: 1px solid #e2e2e2;
+      color: #333;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+      display: inline-block;
+      flex-shrink: 0;
+      font-family: 'Inter', sans-serif;
+    }
+    .cx-chip:hover {
+      background: var(--cx-red);
+      border-color: var(--cx-red);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* Footer Input Area */
+    .cx-input-area {
+      padding: 12px 14px 14px;
+      background: white;
+      border-top: 1px solid var(--cx-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .cx-input-box-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FAFAFA;
+      border: 1.5px solid var(--cx-border);
+      border-radius: 24px;
+      padding: 6px 8px 6px 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .cx-input-box-wrapper:focus-within {
+      border-color: var(--cx-red);
+      box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.08);
+      background: white;
+    }
+
+    /* Auto-growing Textarea */
+    .cx-textarea {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      resize: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--cx-text-primary);
+      max-height: 110px;
+      min-height: 24px;
+      height: 24px;
+      padding: 3px 0;
+      scrollbar-width: none;
+    }
+    .cx-textarea::-webkit-scrollbar { display: none; }
+    .cx-textarea::placeholder { color: #bbb; }
+
+    /* Send Button */
+    .cx-send-btn {
+      background: var(--cx-red);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(227,30,36,0.35);
+    }
+    .cx-send-btn:hover {
+      background: var(--cx-red-hover);
+      transform: scale(1.07);
+      box-shadow: 0 4px 14px rgba(227,30,36,0.45);
+    }
+    .cx-send-btn:active { transform: scale(0.92); }
+    .cx-send-btn:disabled {
+      background: #ddd;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .cx-send-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
+      margin-left: 1px;
+    }
+
+    .cx-footer-note {
+      font-size: 10.5px;
+      color: #bbb;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    /* Error Banner inside panel */
+    .cx-error-banner {
+      background: #FEE2E2;
+      border: 1px solid #FCA5A5;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #991B1B;
+      align-self: center;
+      text-align: center;
+      max-width: 90%;
+      animation: cx-fade-slide 0.3s ease;
+    }
+    /* Rate-limit countdown banner (amber) */
+    .cx-rate-banner {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+    .cx-rate-banner strong { color: #b45309; font-weight: 700; }
+
+    /* ── Animations ── */
+    @keyframes cx-bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+    @keyframes cx-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(39, 201, 63, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }
+    }
+    @keyframes cx-fade-slide {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive Adjustment ── */
+    @media (max-width: 640px) {
+      .cx-widget-container { bottom: 16px; right: 16px; }
+      .cx-launcher-tooltip { display: none; }
+      .cx-chat-panel {
+        position: fixed;
+        bottom: 0 !important; right: 0 !important;
+        top: 0 !important; left: 0 !important;
+        width: 100% !important; height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        z-index: 100000;
+      }
+      .cx-header { padding: 14px 16px; }
+      nav { padding: 0 20px; }
+      .hero { padding: 60px 20px; }
+      main { padding: 40px 16px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-box">CX</div>
+    <div>
+      <div class="nav-brand">Caddxpert AI Innovations</div>
+      <div class="nav-sub">Powered by CAD Point</div>
+    </div>
+  </a>
+  <span class="nav-pill">Chat Widget Demo</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">🤖 AI-Powered Assistant</div>
+  <h1>Your <em>Smart Career</em><br>Advisor — 24 / 7</h1>
+  <p>Instant answers on courses, admissions, placements, and career guidance. Click the red chat bubble →</p>
+</div>
+
+<main>
+
+  <div class="section-title">Widget Features</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-icon">🎨</div>
+      <h3>Brand-Matched Design</h3>
+      <p>Matches Caddxpert's red &amp; dark color identity for a seamless brand experience.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✨</div>
+      <h3>Premium Animations</h3>
+      <p>Spring-physics panel open/close, message slide-in, pulse bubble, and smooth transitions.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Quick Chips</h3>
+      <p>One-tap suggestion buttons to guide students to popular topics instantly.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎓</div>
+      <h3>Smart CTA</h3>
+      <p>After course-related replies, a consultation card links to the free enquiry form.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <h3>Rich Text Replies</h3>
+      <p>Renders <strong>bold</strong>, bullet lists, and headings from Gemini's markdown output.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <h3>Mobile Responsive</h3>
+      <p>Full-screen-friendly layout on phones with repositioned bubble and panel.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Embed on Any Website</div>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-label">HTML</span>
+    </div>
+    <pre><span class="d">&lt;!-- Paste just before &lt;/body&gt; --&gt;</span>
+<span class="r">&lt;script</span>
+  <span class="g">src</span>=<span class="y">"https://yourbackend.onrender.com/widget.js"</span>
+  <span class="g">data-api</span>=<span class="y">"https://yourbackend.onrender.com"</span>
+<span class="r">&gt;&lt;/script&gt;</span></pre>
+  </div>
+
+  <div class="tip">
+    <span class="tip-icon">💡</span>
+    <p>
+      Set <code>data-api</code> to your deployed backend URL. Leave it blank during local development to use the same origin. The widget automatically shows the <strong>free consultation card</strong> whenever a student asks about courses, fees, or admissions.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  &copy; 2026 <strong>Caddxpert AI Innovations</strong> &mdash; Powered by CAD Point &amp; Google Gemini AI
+</footer>
+
+<!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->
+<div class="cx-widget-container" id="cxWidget">
+  
+  <!-- Tooltip hint -->
+  <div class="cx-launcher-tooltip" id="cxTooltip">
+    <span class="cx-tooltip-dot"></span>
+    Ask Caddxpert AI Advisor
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="cx-chat-panel" id="cxPanel">
+    <!-- Header -->
+    <div class="cx-header">
+      <div class="cx-header-info">
+        <div class="cx-header-avatar">CX</div>
+        <div class="cx-header-meta">
+          <span class="cx-header-title">Caddxpert AI Advisor</span>
+          <div class="cx-header-status">
+            <span class="cx-status-dot"></span>
+            <span>Online · Powered by Gemini</span>
+          </div>
+        </div>
+      </div>
+      <div class="cx-header-actions">
+        <button id="cxCloseBtn" title="Minimize Chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="cx-body" id="cxMessages">
+      <!-- Welcome message -->
+      <div class="cx-msg-wrapper bot">
+        <div class="cx-msg-bubble">
+          👋 Welcome to <strong>Caddxpert AI Innovations</strong> (Powered by CAD Point)!
+          <p style="margin-top: 8px;">I can guide you through our professional certificate programs in CAD, MEP, Civil, Mechanical, and more.</p>
+          <p style="margin-top: 8px;">How can I help you shape your engineering career today?</p>
+        </div>
+        <div class="cx-msg-timestamp" id="cxWelcomeTime">12:00 PM</div>
+      </div>
+    </div>
+
+    <!-- Quick action chips -->
+    <div class="cx-chips-container" id="cxChips">
+      <div class="cx-chip" data-msg="Which CAD/Engineering courses do you offer?">CAD Courses 📐</div>
+      <div class="cx-chip" data-msg="Are there placements after course completion?">Placements 💼</div>
+      <div class="cx-chip" data-msg="What are the course fees and durations?">Fees &amp; Duration 💰</div>
+      <div class="cx-chip" data-msg="Can I speak to a counselor for career advice?">Free Counselling 📞</div>
+    </div>
+
+    <!-- Message input area -->
+    <div class="cx-input-area">
+      <div class="cx-input-box-wrapper">
+        <textarea
+          class="cx-textarea"
+          id="cxTextarea"
+          placeholder="Type a message..."
+          rows="1"
+          autocomplete="off"
+        ></textarea>
+        <button class="cx-send-btn" id="cxSendBtn" title="Send message">
+          <svg viewBox="0 0 24 24">
+            <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+          </svg>
+        </button>
+      </div>
+      <div class="cx-footer-note">
+        Powered by Caddxpert AI Innovations · Press Enter to send
+      </div>
+    </div>
+  </div>
+
+  <!-- Launcher bubble -->
+  <button class="cx-launcher" id="cxLauncher">
+    <div class="cx-badge"></div>
+    <svg class="cx-icon-chat" viewBox="0 0 24 24">
+      <path d="M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.2L4,17.2V4h16V16z M7,9h10v2H7V9z M7,5h10v2H7V5z M7,13h7v2H7V13z"/>
+    </svg>
+    <svg class="cx-icon-close" viewBox="0 0 24 24">
+      <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ─── WIDGET LOGIC & BACKEND INTEGRATION ─── -->
+<script>
+  (function() {
+    // ── Config ──
+    const BACKEND_URL   = '';                              // Same origin; change for deployed backend
+    const ENQUIRY_URL   = 'https://caddxpertai.in/enquiry';
+
+    const COURSE_TRIGGERS = [
+      'course','courses','program','training','mechanical','civil','electrical',
+      'mep','autocad','revit','solidworks','catia','creo','ansys','staad',
+      'primavera','sap','bim','hvac','fee','fees','duration','batch','admission',
+      'enroll','join','certificate','diploma','placement','career','job',
+      'digital marketing','tally','excel','power bi','data','learn','scope',
+      'price','consult','counsel','class','force-show'
+    ];
+
+    // ── DOM Elements ──
+    const launcher          = document.getElementById('cxLauncher');
+    const panel             = document.getElementById('cxPanel');
+    const closeBtn          = document.getElementById('cxCloseBtn');
+    const tooltip           = document.getElementById('cxTooltip');
+    const messagesContainer = document.getElementById('cxMessages');
+    const textarea          = document.getElementById('cxTextarea');
+    const sendBtn           = document.getElementById('cxSendBtn');
+    const chipsContainer    = document.getElementById('cxChips');
+    const welcomeTime       = document.getElementById('cxWelcomeTime');
+
+    // ── Init ──
+    welcomeTime.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    let isChatOpen  = false;
+    let isGenerating = false;
+    let chatHistory  = [];   // last 6 messages for context
+
+    // ── Toggle Panel ──
+    function toggleChat() {
+      isChatOpen = !isChatOpen;
+      launcher.classList.toggle('open', isChatOpen);
+      panel.classList.toggle('open', isChatOpen);
+      if (isChatOpen) {
+        tooltip.classList.add('hidden');
+        if (window.innerWidth > 640) setTimeout(() => textarea.focus(), 300);
+        scrollToBottom();
+      }
+    }
+    setTimeout(() => { if (!isChatOpen) tooltip.classList.add('hidden'); }, 7000);
+    launcher.addEventListener('click', toggleChat);
+    closeBtn.addEventListener('click', toggleChat);
+
+    // ── Textarea auto-grow ──
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 110) + 'px';
+    });
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    });
+    sendBtn.addEventListener('click', handleSend);
+
+    // ── Chips ──
+    chipsContainer.addEventListener('click', (e) => {
+      const chip = e.target.closest('.cx-chip');
+      if (!chip || isGenerating) return;
+      const msg = chip.getAttribute('data-msg');
+      if (msg) sendUserMessage(msg);
+    });
+
+    // ── Send ──
+    function handleSend() {
+      const msg = textarea.value.trim();
+      if (!msg || isGenerating) return;
+      sendUserMessage(msg);
+      textarea.value = '';
+      textarea.style.height = '24px';
+    }
+
+    async function sendUserMessage(text) {
+      addMessage('user', text);
+      chatHistory.push({ role: 'user', text });
+      if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
+
+      showTyping();
+      isGenerating = true;
+      sendBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            history: chatHistory.slice(0, -1)
+          })
+        });
+
+        hideTyping();
+
+        // ── Handle rate-limit (429) specifically ──────────────────────────
+        if (res.status === 429) {
+          showRateLimit();
+          return;                          // early exit — finally still runs
+        }
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+
+        const { reply = "I'm unable to respond right now." } = await res.json();
+        addMessage('bot', reply);
+        chatHistory.push({ role: 'model', text: reply });
+        if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
+
+        // Trigger CTA if course-related
+        const isCourse = COURSE_TRIGGERS.some(k => text.toLowerCase().includes(k));
+        if (isCourse) setTimeout(showCTA, 500);
+
+      } catch (err) {
+        hideTyping();
+        showError('Connection trouble. Please try again or call +91 82484 90202.');
+        console.error('[CaddxpertWidget]', err);
+      } finally {
+        isGenerating = false;
+        sendBtn.disabled = false;
+        textarea.focus();
+      }
+    }
+
+    // ── Rate-limit handler: show notice + lock input for 60 s ─────────────
+    function showRateLimit() {
+      const WAIT = 60;                     // seconds to lock
+      let remaining = WAIT;
+
+      // Create banner
+      const el = document.createElement('div');
+      el.className = 'cx-error-banner cx-rate-banner';
+      el.innerHTML = `⏳ Too many messages. Please wait <strong id="cxCountdown">${remaining}s</strong> before sending again.`;
+      messagesContainer.appendChild(el);
+      scrollToBottom();
+
+      // Lock send button
+      sendBtn.disabled = true;
+      textarea.disabled = true;
+      textarea.placeholder = `Please wait ${remaining}s…`;
+
+      const tick = setInterval(() => {
+        remaining--;
+        const cd = document.getElementById('cxCountdown');
+        if (cd) cd.textContent = remaining + 's';
+        textarea.placeholder = `Please wait ${remaining}s…`;
+
+        if (remaining <= 0) {
+          clearInterval(tick);
+          sendBtn.disabled = false;
+          textarea.disabled = false;
+          textarea.placeholder = 'Type a message...';
+          if (el.parentNode) el.remove();
+          textarea.focus();
+        }
+      }, 1000);
+    }
+
+    // ── Markdown parser ──
+    function parseMarkdown(text) {
+      if (!text) return '';
+      // Escape HTML first
+      let html = text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      const lines = html.split('\n');
+      const out = [];
+      let inList = false;
+
+      for (const raw of lines) {
+        const line = raw.trim();
+        // Standalone bold line → heading
+        if (/^\*\*(.+)\*\*[:\s]*$/.test(line)) {
+          if (inList) { out.push('</ul>'); inList = false; }
+          out.push(`<h3>${line.replace(/^\*\*(.+?)\*\*[:\s]*$/, '$1')}</h3>`);
+        } else if (/^[*\-]\s+/.test(raw)) {
+          if (!inList) { out.push('<ul>'); inList = true; }
+          out.push(`<li>${fmt(raw.replace(/^[*\-]\s+/, ''))}</li>`);
+        } else if (/^#{1,3}\s/.test(line)) {
+          if (inList) { out.push('</ul>'); inList = false; }
+          out.push(`<h3>${fmt(line.replace(/^#{1,3}\s/, ''))}</h3>`);
+        } else {
+          if (inList) { out.push('</ul>'); inList = false; }
+          if (!line) out.push('<br>');
+          else out.push(`<p>${fmt(line)}</p>`);
+        }
+      }
+      if (inList) out.push('</ul>');
+      return out.join('');
+    }
+
+    function fmt(t) {
+      return t
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    }
+
+    // ── Add message to UI ──
+    function addMessage(sender, text) {
+      const wrapper = document.createElement('div');
+      wrapper.className = `cx-msg-wrapper ${sender}`;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'cx-msg-bubble';
+      bubble.innerHTML = sender === 'bot' ? parseMarkdown(text) : escapeHTML(text);
+
+      const ts = document.createElement('div');
+      ts.className = 'cx-msg-timestamp';
+      ts.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      wrapper.appendChild(bubble);
+      wrapper.appendChild(ts);
+      messagesContainer.appendChild(wrapper);
+      scrollToBottom();
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g,
+        t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t)
+      );
+    }
+
+    // ── Typing indicator ──
+    let typingEl = null;
+    function showTyping() {
+      if (typingEl) return;
+      typingEl = document.createElement('div');
+      typingEl.className = 'cx-typing-bubble';
+      typingEl.innerHTML = '<span class="cx-typing-dot"></span><span class="cx-typing-dot"></span><span class="cx-typing-dot"></span>';
+      messagesContainer.appendChild(typingEl);
+      scrollToBottom();
+    }
+    function hideTyping() {
+      if (typingEl) { typingEl.remove(); typingEl = null; }
+    }
+
+    // ── CTA Card ──
+    function showCTA() {
+      // Replace any existing CTA
+      const old = messagesContainer.querySelector('.cx-cta-card');
+      if (old) old.remove();
+
+      const card = document.createElement('div');
+      card.className = 'cx-cta-card';
+      card.innerHTML = `
+        <div class="cx-cta-title">🎓 Free Counselling &amp; Admission Guidance</div>
+        <div class="cx-cta-desc">Get guidance from our expert career advisors and explore the best course for your goals.</div>
+        <a class="cx-cta-btn" href="${ENQUIRY_URL}" target="_blank" rel="noopener">Register for Free Consultation →</a>
+      `;
+      messagesContainer.appendChild(card);
+      scrollToBottom();
+    }
+
+    // ── Error ──
+    function showError(msg) {
+      const el = document.createElement('div');
+      el.className = 'cx-error-banner';
+      el.textContent = '⚠️ ' + msg;
+      messagesContainer.appendChild(el);
+      scrollToBottom();
+    }
+
+    // ── Scroll ──
+    function scrollToBottom() {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+  })();
+</script>
+
+</body>
+</html>

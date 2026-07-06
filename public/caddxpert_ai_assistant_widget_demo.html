@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Caddxpert AI Assistant — Widget Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Core Variables ── */
+    :root {
+      --cx-red: #E31E24;
+      --cx-red-hover: #c41318;
+      --cx-dark: #1C1C1C;
+      --cx-dark-light: #2e2e2e;
+      --cx-gray-bg: #f7f7f7;
+      --cx-border: #e8e8e8;
+      --cx-text-primary: #1C1C1C;
+      --cx-text-secondary: #666666;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cx-gray-bg);
+      color: var(--cx-text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: var(--cx-dark);
+      height: 62px;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+    }
+    .nav-logo-box {
+      width: 36px;
+      height: 36px;
+      background: var(--cx-red);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    .nav-brand { color: white; font-weight: 700; font-size: 16px; }
+    .nav-sub { color: rgba(255,255,255,0.45); font-size: 11px; margin-top: 1px; }
+    .nav-pill {
+      background: rgba(227,30,36,0.15);
+      border: 1px solid rgba(227,30,36,0.35);
+      border-radius: 20px;
+      padding: 5px 16px;
+      color: var(--cx-red);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--cx-dark) 0%, var(--cx-dark-light) 100%);
+      padding: 80px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: rgba(227,30,36,0.1);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -40px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(227,30,36,0.07);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(227,30,36,0.15);
+      border: 1px solid rgba(227,30,36,0.4);
+      border-radius: 20px;
+      padding: 6px 18px;
+      color: var(--cx-red);
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 22px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      color: white;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .hero h1 em { color: var(--cx-red); font-style: normal; }
+    .hero p {
+      color: rgba(255,255,255,0.55);
+      font-size: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ── Content ── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 56px 24px 100px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cx-text-primary);
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 20px;
+      background: var(--cx-red);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Feature Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 52px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      border: 1.5px solid var(--cx-border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .card-icon { font-size: 28px; margin-bottom: 12px; }
+    .card h3 { font-size: 14.5px; font-weight: 700; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: var(--cx-text-secondary); line-height: 1.5; }
+
+    /* Code block */
+    .code-wrap {
+      background: var(--cx-dark);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 52px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    }
+    .code-bar {
+      background: var(--cx-dark-light);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .code-dots { display: flex; gap: 6px; }
+    .code-dots span { width: 12px; height: 12px; border-radius: 50%; }
+    .code-dots span:nth-child(1) { background: #ff5f56; }
+    .code-dots span:nth-child(2) { background: #ffbd2e; }
+    .code-dots span:nth-child(3) { background: #27c93f; }
+    .code-label { color: #888; font-size: 12px; font-family: monospace; }
+    .code-wrap pre {
+      padding: 22px 26px;
+      font-size: 13.5px;
+      font-family: 'Fira Code', Consolas, monospace;
+      line-height: 1.75;
+      overflow-x: auto;
+      color: #e0e0e0;
+    }
+    .code-wrap .r { color: #ff8080; }
+    .code-wrap .g { color: #80d980; }
+    .code-wrap .y { color: #ffd080; }
+    .code-wrap .d { color: #888; font-style: italic; }
+
+    /* Tip box */
+    .tip {
+      background: white;
+      border: 1.5px solid var(--cx-border);
+      border-left: 4px solid var(--cx-red);
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .tip-icon { font-size: 22px; flex-shrink: 0; }
+    .tip p { font-size: 13.5px; color: #444; line-height: 1.65; }
+    .tip code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-family: monospace;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--cx-dark);
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+    }
+    footer strong { color: var(--cx-red); }
+
+    /* ─── CHAT WIDGET STYLES ─── */
+    .cx-widget-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Bubble Launcher */
+    .cx-launcher {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cx-red) 0%, #b81419 100%);
+      box-shadow: 0 4px 20px rgba(227, 30, 36, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+      border: none;
+      outline: none;
+      position: relative;
+    }
+    .cx-launcher:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 24px rgba(227, 30, 36, 0.5);
+    }
+    .cx-launcher:active {
+      transform: scale(0.95);
+    }
+    .cx-launcher svg {
+      width: 26px;
+      height: 26px;
+      fill: white;
+      transition: transform 0.3s ease, opacity 0.2s;
+    }
+    .cx-launcher .cx-icon-close {
+      position: absolute;
+      opacity: 0;
+      transform: rotate(-45deg) scale(0.8);
+    }
+    .cx-launcher.open .cx-icon-chat {
+      opacity: 0;
+      transform: rotate(45deg) scale(0.8);
+    }
+    .cx-launcher.open .cx-icon-close {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    /* Notification Badge */
+    .cx-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      background: #27c93f;
+      border: 2px solid white;
+      border-radius: 50%;
+      animation: cx-pulse 2s infinite;
+    }
+
+    /* Launcher Tooltip */
+    .cx-launcher-tooltip {
+      position: absolute;
+      right: 76px;
+      bottom: 10px;
+      background: white;
+      border: 1px solid var(--cx-border);
+      border-radius: 12px;
+      padding: 10px 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--cx-text-primary);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 1;
+      transform: translateX(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cx-launcher-tooltip.hidden {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    .cx-tooltip-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--cx-red);
+      border-radius: 50%;
+    }
+
+    /* Chat Panel */
+    .cx-chat-panel {
+      position: absolute;
+      bottom: 76px;
+      right: 0;
+      width: 385px;
+      height: 600px;
+      max-height: calc(100vh - 120px);
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cx-chat-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    /* Panel Header */
+    .cx-header {
+      background: var(--cx-dark);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .cx-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .cx-header-avatar {
+      width: 38px;
+      height: 38px;
+      background: var(--cx-red);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: white;
+    }
+    .cx-header-meta {
+      display: flex;
+      flex-direction: column;
+    }
+    .cx-header-title {
+      color: white;
+      font-weight: 700;
+      font-size: 14.5px;
+      line-height: 1.2;
+    }
+    .cx-header-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    .cx-status-dot {
+      width: 7px;
+      height: 7px;
+      background: #27c93f;
+      border-radius: 50%;
+    }
+    .cx-header-actions button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.6);
+      padding: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cx-header-actions button:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    /* Message Area */
+    .cx-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #FAFAFA;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar for Message Area */
+    .cx-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .cx-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .cx-body::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    /* Chat Bubbles */
+    .cx-msg-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 82%;
+      animation: cx-fade-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .cx-msg-wrapper.bot {
+      align-self: flex-start;
+    }
+    .cx-msg-wrapper.user {
+      align-self: flex-end;
+    }
+
+    .cx-msg-bubble {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+    .bot .cx-msg-bubble {
+      background: white;
+      color: var(--cx-text-primary);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .user .cx-msg-bubble {
+      background: var(--cx-red);
+      color: white;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(227, 30, 36, 0.15);
+    }
+
+    .cx-msg-timestamp {
+      font-size: 10px;
+      color: #999;
+      margin-top: 4px;
+      margin-left: 4px;
+    }
+    .user .cx-msg-timestamp {
+      align-self: flex-end;
+      margin-right: 4px;
+    }
+
+    /* Markdown Styling in Bot Bubbles */
+    .cx-msg-bubble strong, .cx-msg-bubble b {
+      font-weight: 700;
+      color: #000;
+    }
+    .cx-msg-bubble p {
+      margin-bottom: 8px;
+    }
+    .cx-msg-bubble p:last-child {
+      margin-bottom: 0;
+    }
+    .cx-msg-bubble ul, .cx-msg-bubble ol {
+      padding-left: 18px;
+      margin: 8px 0;
+    }
+    .cx-msg-bubble li {
+      margin-bottom: 4px;
+    }
+
+    /* Dynamic Typing Indicator */
+    .cx-typing-bubble {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 12px 18px;
+      background: white;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.04);
+      width: fit-content;
+      align-self: flex-start;
+      margin-bottom: 12px;
+    }
+    .cx-typing-dot {
+      width: 7px;
+      height: 7px;
+      background: #c0c0c0;
+      border-radius: 50%;
+      animation: cx-bounce 1.4s infinite ease-in-out both;
+    }
+    .cx-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .cx-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    /* Action CTA Card */
+    .cx-cta-card {
+      background: linear-gradient(135deg, #FFF8F8 0%, #FFF1F1 100%);
+      border: 1px solid rgba(227, 30, 36, 0.15);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 15px rgba(227, 30, 36, 0.04);
+      align-self: flex-start;
+      max-width: 90%;
+      animation: cx-fade-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .cx-cta-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--cx-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cx-cta-desc {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+    }
+    .cx-cta-btn {
+      background: var(--cx-red);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      text-align: center;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .cx-cta-btn:hover {
+      background: var(--cx-red-hover);
+    }
+    .cx-cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Quick Action Chips */
+    .cx-chips-container {
+      padding: 10px 14px;
+      background: white;
+      border-top: 1px solid var(--cx-border);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scroll-behavior: smooth;
+    }
+    .cx-chips-container::-webkit-scrollbar {
+      display: none; /* Hide default scrollbar for sleek iOS-style swipe */
+    }
+    .cx-chip {
+      background: #f1f1f1;
+      border: 1px solid #e2e2e2;
+      color: #444;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .cx-chip:hover {
+      background: #e8e8e8;
+      border-color: #d0d0d0;
+      transform: translateY(-1px);
+    }
+    .cx-chip:active {
+      transform: translateY(0);
+    }
+
+    /* Footer Input Area */
+    .cx-input-area {
+      padding: 12px 16px 16px;
+      background: white;
+      border-top: 1px solid var(--cx-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cx-input-box-wrapper {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: #FAFAFA;
+      border: 1.5px solid var(--cx-border);
+      border-radius: 14px;
+      padding: 6px 12px 6px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .cx-input-box-wrapper:focus-within {
+      border-color: var(--cx-red);
+      box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.08);
+      background: white;
+    }
+
+    /* Auto-growing Textarea */
+    .cx-textarea {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--cx-text-primary);
+      max-height: 110px;
+      min-height: 24px;
+      height: 24px;
+      padding: 3px 0;
+    }
+    .cx-textarea::placeholder {
+      color: #aaa;
+    }
+
+    /* Send Button */
+    .cx-send-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      transition: background 0.2s, transform 0.1s;
+      color: #999;
+      flex-shrink: 0;
+    }
+    .cx-send-btn.active {
+      color: var(--cx-red);
+      background: rgba(227, 30, 36, 0.06);
+    }
+    .cx-send-btn.active:hover {
+      background: rgba(227, 30, 36, 0.1);
+      transform: scale(1.05);
+    }
+    .cx-send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .cx-footer-note {
+      font-size: 10px;
+      color: rgba(0,0,0,0.5);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* ─── ENQUIRY FORM MODAL ─── */
+    .cx-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 16px;
+    }
+    .cx-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .cx-modal-card {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      overflow: hidden;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cx-modal.open .cx-modal-card {
+      transform: scale(1) translateY(0);
+    }
+    .cx-modal-header {
+      background: var(--cx-dark);
+      padding: 20px 24px;
+      color: white;
+      position: relative;
+    }
+    .cx-modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .cx-modal-header p {
+      color: rgba(255,255,255,0.6);
+      font-size: 12px;
+    }
+    .cx-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .cx-modal-close:hover {
+      color: white;
+    }
+    .cx-modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .cx-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cx-form-group label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--cx-text-primary);
+    }
+    .cx-form-group input, .cx-form-group select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--cx-border);
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .cx-form-group input:focus, .cx-form-group select:focus {
+      border-color: var(--cx-red);
+    }
+    .cx-form-submit {
+      background: var(--cx-red);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .cx-form-submit:hover {
+      background: var(--cx-red-hover);
+    }
+
+    /* Mock Error Banner inside panel */
+    .cx-error-banner {
+      background: #FEE2E2;
+      border: 1px solid #FCA5A5;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #991B1B;
+      margin-bottom: 8px;
+      align-self: center;
+      text-align: center;
+      max-width: 90%;
+      animation: cx-fade-slide 0.3s ease;
+    }
+
+    /* ── Animations ── */
+    @keyframes cx-bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+    @keyframes cx-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(39, 201, 63, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }
+    }
+    @keyframes cx-fade-slide {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Responsive Adjustment ── */
+    @media (max-width: 640px) {
+      .cx-widget-container {
+        bottom: 16px;
+        right: 16px;
+      }
+      .cx-launcher-tooltip {
+        display: none; /* Hide tooltip on small mobile screens */
+      }
+      .cx-chat-panel {
+        position: fixed;
+        bottom: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        z-index: 100000;
+      }
+      .cx-header {
+        padding: 14px 16px;
+      }
+      nav {
+        padding: 0 20px;
+      }
+      .hero {
+        padding: 60px 20px;
+      }
+      main {
+        padding: 40px 16px 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-box">CX</div>
+    <div>
+      <div class="nav-brand">Caddxpert AI Innovations</div>
+      <div class="nav-sub">Powered by CAD Point</div>
+    </div>
+  </a>
+  <span class="nav-pill">Chat Widget Demo</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">🤖 AI-Powered Assistant</div>
+  <h1>Your <em>Smart Career</em><br>Advisor — 24 / 7</h1>
+  <p>Instant answers on courses, admissions, placements, and career guidance. Click the red chat bubble →</p>
+</div>
+
+<main>
+
+  <div class="section-title">Widget Features</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-icon">🎨</div>
+      <h3>Brand-Matched Design</h3>
+      <p>Matches Caddxpert's red &amp; dark color identity for a seamless brand experience.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✨</div>
+      <h3>Premium Animations</h3>
+      <p>Spring-physics panel open/close, message slide-in, pulse bubble, and smooth transitions.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Quick Chips</h3>
+      <p>One-tap suggestion buttons to guide students to popular topics instantly.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎓</div>
+      <h3>Smart CTA</h3>
+      <p>After course-related replies, a consultation card links to the free enquiry form.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <h3>Rich Text Replies</h3>
+      <p>Renders <strong>bold</strong>, bullet lists, and headings from Gemini's markdown output.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <h3>Mobile Responsive</h3>
+      <p>Full-screen-friendly layout on phones with repositioned bubble and panel.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Embed on Any Website</div>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-dots"><span></span><span></span><span></span></div>
+      <span class="code-label">HTML</span>
+    </div>
+    <pre><span class="d">&lt;!-- Paste just before &lt;/body&gt; --&gt;</span>
+<span class="r">&lt;script</span>
+  <span class="g">src</span>=<span class="y">"https://yourbackend.onrender.com/widget.js"</span>
+  <span class="g">data-api</span>=<span class="y">"https://yourbackend.onrender.com"</span>
+<span class="r">&gt;&lt;/script&gt;</span></pre>
+  </div>
+
+  <div class="tip">
+    <span class="tip-icon">💡</span>
+    <p>
+      Set <code>data-api</code> to your deployed backend URL. Leave it blank during local development to use the same origin. The widget automatically shows the <strong>free consultation card</strong> whenever a student asks about courses, fees, or admissions.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  &copy; 2026 <strong>Caddxpert AI Innovations</strong> &mdash; Powered by CAD Point &amp; Google Gemini AI
+</footer>
+
+<!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->
+<div class="cx-widget-container" id="cxWidget">
+  
+  <!-- Tooltip hint -->
+  <div class="cx-launcher-tooltip" id="cxTooltip">
+    <span class="cx-tooltip-dot"></span>
+    Ask Caddxpert AI Advisor
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="cx-chat-panel" id="cxPanel">
+    <!-- Header -->
+    <div class="cx-header">
+      <div class="cx-header-info">
+        <div class="cx-header-avatar">CX</div>
+        <div class="cx-header-meta">
+          <span class="cx-header-title">Caddxpert AI Advisor</span>
+          <div class="cx-header-status">
+            <span class="cx-status-dot"></span>
+            <span>Online • Powered by Cad Point</span>
+          </div>
+        </div>
+      </div>
+      <div class="cx-header-actions">
+        <!-- Close / Minimize -->
+        <button id="cxCloseBtn" title="Minimize Chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="cx-body" id="cxMessages">
+      <!-- Welcome message -->
+      <div class="cx-msg-wrapper bot">
+        <div class="cx-msg-bubble">
+          👋 Welcome to <strong>Caddxpert AI Innovations</strong> (Powered by CAD Point)! 
+          <p style="margin-top: 8px;">I can guide you through our professional certificate programs in CAD, MEP, Civil Architecture, Mechanical, and Software Engineering.</p>
+          <p style="margin-top: 8px;">How can I help you shape your engineering career today?</p>
+        </div>
+        <div class="cx-msg-timestamp" id="cxWelcomeTime">12:00 PM</div>
+      </div>
+    </div>
+
+    <!-- Quick action chips -->
+    <div class="cx-chips-container" id="cxChips">
+      <div class="cx-chip" data-msg="Which CAD/Engineering courses do you offer?">CAD Courses 📐</div>
+      <div class="cx-chip" data-msg="Are there placements after course completion?">Placements 💼</div>
+      <div class="cx-chip" data-msg="What are the course fees and durations?">Fees &amp; Duration 💰</div>
+      <div class="cx-chip" data-msg="Can I speak to a counselor for career advice?">Free Counselling 📞</div>
+    </div>
+
+    <!-- Message input area -->
+    <div class="cx-input-area">
+      <div class="cx-input-box-wrapper">
+        <textarea 
+          class="cx-textarea" 
+          id="cxTextarea" 
+          placeholder="Type a message..." 
+          rows="1"
+          autocomplete="off"
+        ></textarea>
+        <button class="cx-send-btn" id="cxSendBtn" title="Send message">
+          <svg viewBox="0 0 24 24">
+            <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+          </svg>
+        </button>
+      </div>
+      <div class="cx-footer-note">
+        Our AI answers immediately. Press Enter to Send.
+      </div>
+    </div>
+  </div>
+
+  <!-- Launcher bubble -->
+  <button class="cx-launcher" id="cxLauncher">
+    <div class="cx-badge"></div>
+    <!-- Chat Icon -->
+    <svg class="cx-icon-chat" viewBox="0 0 24 24">
+      <path d="M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.2L4,17.2V4h16V16z M7,9h10v2H7V9z M7,5h10v2H7V5z M7,13h7v2H7V13z"/>
+    </svg>
+    <!-- Close Icon -->
+    <svg class="cx-icon-close" viewBox="0 0 24 24">
+      <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ─── ENQUIRY FORM MODAL (SMART CTA INTEGRATION) ─── -->
+<div class="cx-modal" id="cxModal">
+  <div class="cx-modal-card">
+    <div class="cx-modal-header">
+      <h3>Book Free Career Session</h3>
+      <p>Consult with our experts for course selection and roadmap advice.</p>
+      <button class="cx-modal-close" id="cxModalCloseBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <form id="cxEnquiryForm">
+      <div class="cx-modal-body">
+        <div class="cx-form-group">
+          <label for="studentName">Full Name</label>
+          <input type="text" id="studentName" required placeholder="John Doe">
+        </div>
+        <div class="cx-form-group">
+          <label for="studentPhone">Phone Number</label>
+          <input type="tel" id="studentPhone" required placeholder="+91 XXXXX XXXXX">
+        </div>
+        <div class="cx-form-group">
+          <label for="studentInterest">Interested Program</label>
+          <select id="studentInterest">
+            <option value="Mechanical CAD / SolidWorks / Creo">Mechanical CAD (Revit/SolidWorks/Creo)</option>
+            <option value="Civil Architecture / AutoCAD / Revit / 3ds Max">Civil &amp; Architectural (AutoCAD/Revit)</option>
+            <option value="MEP (Mechanical, Electrical, Plumbing)">MEP Systems Design</option>
+            <option value="Software Development / Full-Stack IT">Software &amp; IT Courses</option>
+            <option value="General Consultation">General Career Counselling</option>
+          </select>
+        </div>
+        <button type="submit" class="cx-form-submit">Request Free Consultation</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ─── WIDGET LOGIC & GEMINI INTEGRATION ─── -->
+<script>
+  (function() {
+    // ── Widget DOM Elements ──
+    const launcher = document.getElementById('cxLauncher');
+    const panel = document.getElementById('cxPanel');
+    const closeBtn = document.getElementById('cxCloseBtn');
+    const tooltip = document.getElementById('cxTooltip');
+    const messagesContainer = document.getElementById('cxMessages');
+    const textarea = document.getElementById('cxTextarea');
+    const sendBtn = document.getElementById('cxSendBtn');
+    const chipsContainer = document.getElementById('cxChips');
+    const modal = document.getElementById('cxModal');
+    const modalCloseBtn = document.getElementById('cxModalCloseBtn');
+    const enquiryForm = document.getElementById('cxEnquiryForm');
+    const welcomeTime = document.getElementById('cxWelcomeTime');
+
+    // ── Set Welcome Timestamp ──
+    const now = new Date();
+    welcomeTime.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // ── State variables ──
+    let isChatOpen = false;
+    let isGenerating = false;
+    let consecutiveErrors = 0;
+
+    // ── Gemini API Settings ──
+    const apiKey = ""; // Runtime-injected API key
+    const modelName = "gemini-2.5-flash-preview-09-2025";
+    const systemPrompt = `You are the friendly, expert Caddxpert AI Career Advisor, representing Caddxpert AI Innovations & CAD Point.
+Your goal is to guide students on choosing the best professional engineering, drafting, and programming courses.
+Keep your tone highly encouraging, professional, and structured. Use paragraph-based conversational styles, bullet points where necessary, and bold words for courses.
+
+Key Caddxpert Offerings:
+- CAD Courses: AutoCAD, Revit, SolidWorks, CATIA, Creo, 3ds Max, Maya.
+- MEP Courses: Mechanical, Electrical, Plumbing design with hands-on labs.
+- IT / Development: Python, Full-Stack Web Development, Java.
+- Placements: 100% placement assistance, mock interviews, global certificate credentials.
+- Location: Multiple physical campus centers and online dynamic classes.
+
+If the student is asking about courses, fees, placements, schedules, or wants direct counseling:
+Always introduce our "Free Expert Career Consultation Session" and encourage them to click the 'Book Consultation' action card. Do not give exact static prices as prices vary; tell them that customized plans and installment options are available.`;
+
+    // ── Toggle Widget Panel ──
+    function toggleChat() {
+      isChatOpen = !isChatOpen;
+      launcher.classList.toggle('open', isChatOpen);
+      panel.classList.toggle('open', isChatOpen);
+      
+      if (isChatOpen) {
+        tooltip.classList.add('hidden');
+        // Auto-focus input on desktop
+        if (window.innerWidth > 640) {
+          setTimeout(() => textarea.focus(), 300);
+        }
+        scrollChatToBottom();
+      }
+    }
+
+    // Dismiss tooltip after 7 seconds
+    setTimeout(() => {
+      if (!isChatOpen) {
+        tooltip.classList.add('hidden');
+      }
+    }, 7000);
+
+    // Event listeners for open/close
+    launcher.addEventListener('click', toggleChat);
+    closeBtn.addEventListener('click', toggleChat);
+
+    // ── Elastic Auto-growing Textarea ──
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      const scrollHeight = textarea.scrollHeight;
+      const borderAdjustment = 6; // Padding/border alignment correction
+      textarea.style.height = Math.min(scrollHeight - borderAdjustment, 110) + 'px';
+
+      // Toggle active status for send button
+      if (textarea.value.trim().length > 0) {
+        sendBtn.classList.add('active');
+      } else {
+        sendBtn.classList.remove('active');
+      }
+    });
+
+    // ── Keyboard Actions inside Input area ──
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleUserSend();
+      }
+    });
+
+    sendBtn.addEventListener('click', handleUserSend);
+
+    // ── Dynamic Markdown parser ──
+    function parseMarkdown(text) {
+      if (!text) return "";
+      let html = text;
+      // Headers
+      html = html.replace(/^### (.*$)/gim, '<h4 style="font-weight:700; margin-top:8px; margin-bottom:4px;">$1</h4>');
+      html = html.replace(/^## (.*$)/gim, '<h3 style="font-weight:700; margin-top:10px; margin-bottom:4px;">$1</h3>');
+      html = html.replace(/^# (.*$)/gim, '<h2 style="font-weight:700; margin-top:12px; margin-bottom:6px;">$1</h2>');
+      // Bold text
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      // List items
+      html = html.replace(/^\s*\n\*/gm, '~');
+      html = html.replace(/^-\s+(.*)/gim, '<li>$1</li>');
+      html = html.replace(/^\s*\*\s+(.*)/gim, '<li>$1</li>');
+      // Wrap list elements safely
+      html = html.replace(/(<li>.*<\/li>)/gim, '<ul style="margin:6px 0; padding-left:16px;">$1</ul>');
+      // Replace triple list tags
+      html = html.replace(/<\/ul>\s*<ul style="margin:6px 0; padding-left:16px;">/g, '');
+      // Linebreaks
+      html = html.replace(/\n/g, '<br>');
+      return html;
+    }
+
+    // ── Print Message to UI ──
+    function addMessageToUI(sender, text) {
+      const msgWrapper = document.createElement('div');
+      msgWrapper.className = `cx-msg-wrapper ${sender}`;
+
+      const msgBubble = document.createElement('div');
+      msgBubble.className = 'cx-msg-bubble';
+      msgBubble.innerHTML = sender === 'bot' ? parseMarkdown(text) : escapeHTML(text);
+
+      const timestamp = document.createElement('div');
+      timestamp.className = 'cx-msg-timestamp';
+      const current = new Date();
+      timestamp.textContent = current.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      msgWrapper.appendChild(msgBubble);
+      msgWrapper.appendChild(timestamp);
+      messagesContainer.appendChild(msgWrapper);
+      
+      scrollChatToBottom();
+      return msgWrapper;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    function scrollChatToBottom() {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // ── Quick Chips Click ──
+    chipsContainer.addEventListener('click', (e) => {
+      const chip = e.target.closest('.cx-chip');
+      if (!chip || isGenerating) return;
+      const chipMessage = chip.getAttribute('data-msg');
+      if (chipMessage) {
+        sendUserMessage(chipMessage);
+      }
+    });
+
+    // ── Send Handler ──
+    function handleUserSend() {
+      const msg = textarea.value.trim();
+      if (!msg || isGenerating) return;
+      sendUserMessage(msg);
+      // Reset input area
+      textarea.value = '';
+      textarea.style.height = '24px';
+      sendBtn.classList.remove('active');
+    }
+
+    function sendUserMessage(msgText) {
+      addMessageToUI('user', msgText);
+      showTypingIndicator();
+      isGenerating = true;
+
+      // Ask Gemini
+      fetchGeminiResponse(msgText);
+    }
+
+    // ── Typing Indicator ──
+    let typingBubbleRef = null;
+    function showTypingIndicator() {
+      if (typingBubbleRef) return;
+      typingBubbleRef = document.createElement('div');
+      typingBubbleRef.className = 'cx-typing-bubble';
+      typingBubbleRef.innerHTML = `
+        <span class="cx-typing-dot"></span>
+        <span class="cx-typing-dot"></span>
+        <span class="cx-typing-dot"></span>
+      `;
+      messagesContainer.appendChild(typingBubbleRef);
+      scrollChatToBottom();
+    }
+
+    function removeTypingIndicator() {
+      if (typingBubbleRef) {
+        typingBubbleRef.remove();
+        typingBubbleRef = null;
+      }
+    }
+
+    // ── API Fetch Call with Exponential Backoff ──
+    async function fetchGeminiResponse(userQuery, attempt = 0) {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] }
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!responseText) {
+          throw new Error("Empty response received from the model.");
+        }
+
+        // Success Action
+        removeTypingIndicator();
+        addMessageToUI('bot', responseText);
+        consecutiveErrors = 0; // reset
+        
+        // Check for course consultation context trigger
+        triggerSmartCTA(userQuery + " " + responseText);
+
+      } catch (err) {
+        console.error(err);
+        if (attempt < 5) {
+          const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s, 8s, 16s
+          setTimeout(() => {
+            fetchGeminiResponse(userQuery, attempt + 1);
+          }, delay);
+        } else {
+          removeTypingIndicator();
+          showInChatError("Connection trouble. Don't worry, you can easily request counseling directly below!");
+          consecutiveErrors++;
+          triggerSmartCTA("courses force-show"); // always give CTA fallback
+        }
+      } finally {
+        isGenerating = false;
+      }
+    }
+
+    // ── Smart Context-Aware CTA Trigger ──
+    function triggerSmartCTA(textContext) {
+      const lowercase = textContext.toLowerCase();
+      const triggers = ['course', 'fee', 'admission', 'learn', 'placement', 'class', 'counsel', 'price', 'consult', 'duration', 'career', 'force-show'];
+      
+      const containsTrigger = triggers.some(t => lowercase.includes(t));
+      if (containsTrigger) {
+        // Prevent stacking duplicate cards instantly
+        const existingCTA = messagesContainer.querySelector('.cx-cta-card');
+        if (existingCTA) {
+          existingCTA.remove(); // keep only the newest actionable CTA
+        }
+
+        setTimeout(() => {
+          const ctaCard = document.createElement('div');
+          ctaCard.className = 'cx-cta-card';
+          ctaCard.innerHTML = `
+            <div class="cx-cta-title">
+              <span>🎓</span> Free Counselling & Admission Guidance
+            </div>
+            <div class="cx-cta-desc">
+              Get an instant callback from our expert senior career advisors and secure special discounts on standard course fees.
+            </div>
+            <button class="cx-cta-btn" id="cxCTAActionBtn">Book Counseling Now</button>
+          `;
+          messagesContainer.appendChild(ctaCard);
+          scrollChatToBottom();
+
+          // Connect modal opening trigger
+          const actionBtn = ctaCard.querySelector('#cxCTAActionBtn');
+          actionBtn.addEventListener('click', openEnquiryModal);
+        }, 600);
+      }
+    }
+
+    // ── Custom In-Chat UI Notice ──
+    function showInChatError(msg) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'cx-error-banner';
+      errorDiv.innerText = msg;
+      messagesContainer.appendChild(errorDiv);
+      scrollChatToBottom();
+    }
+
+    // ── Enquiry Form & Modal Actions ──
+    function openEnquiryModal() {
+      modal.classList.add('open');
+    }
+
+    function closeEnquiryModal() {
+      modal.classList.remove('open');
+    }
+
+    modalCloseBtn.addEventListener('click', closeEnquiryModal);
+    
+    // Close modal if overlay clicked
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeEnquiryModal();
+      }
+    });
+
+    enquiryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('studentName').value;
+      const phone = document.getElementById('studentPhone').value;
+      const interest = document.getElementById('studentInterest').value;
+
+      // Close modal
+      closeEnquiryModal();
+
+      // Show mock success bubble in chat panel
+      addMessageToUI('bot', `🎉 **Thank you, ${name}!** We have successfully received your request for direct admission counseling regarding **${interest}**.\n\nA dedicated executive from our CAD Point advisory team will reach out to you on **${phone}** shortly!`);
+      
+      // Clear inputs
+      enquiryForm.reset();
+    });
+
+  })();
+</script>
+
+</body>
+</html>
