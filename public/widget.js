@@ -1,770 +1,264 @@
-(function () {
+const fs = require('fs');
+
+const html = fs.readFileSync('public/caddxpert_ai_assistant_widget_demo.html', 'utf8');
+
+// Extract CSS
+const cssMatch = html.match(/\/\* ─── CHAT WIDGET STYLES ─── \*\/[\s\S]*?@media \(max-width: 640px\) \{[\s\S]*?\}\s*\}/);
+let css = cssMatch ? cssMatch[0] : '';
+css = `:root {
+  --cx-red: #E31E24;
+  --cx-red-hover: #c41318;
+  --cx-dark: #1C1C1C;
+  --cx-dark-light: #2e2e2e;
+  --cx-gray-bg: #f7f7f7;
+  --cx-border: #e8e8e8;
+  --cx-text-primary: #1C1C1C;
+  --cx-text-secondary: #666666;
+}\n` + css;
+
+// Add rate-banner css
+css += `
+/* Rate-limit countdown banner (amber) */
+.cx-rate-banner {
+  background: #fffbeb !important;
+  border-color: #fcd34d !important;
+  color: #92400e !important;
+}
+.cx-rate-banner strong { color: #b45309; font-weight: 700; }
+`;
+
+// Extract HTML
+const htmlMatch = html.match(/<!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->[\s\S]*?<\/button>\s*<\/div>/);
+let widgetHtml = htmlMatch ? htmlMatch[0] : '';
+
+const jsContent = `(function () {
   'use strict';
 
-  /* ── Config ─────────────────────────────────────────────────────────── */
   const scriptTag = document.currentScript;
   const BASE_URL  = (scriptTag && scriptTag.getAttribute('data-api')) || '';
   const ENQUIRY   = 'https://caddxpertai.in/enquiry';
 
-  const COURSE_KW = [
-    'course','courses','program','training','mechanical','civil','electrical',
-    'mep','autocad','revit','solidworks','catia','creo','ansys','staad',
-    'primavera','sap','bim','hvac','fee','fees','duration','batch','admission',
-    'enroll','join','certificate','diploma','placement','career','job',
-    'digital marketing','tally','excel','power bi','data','learn','scope',
-    'price','consult','counsel','class'
-  ];
-
-  /* ── State ───────────────────────────────────────────────────────────── */
-  let chatOpen    = false;
-  let busy        = false;
-  let history     = [];
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     STYLES
-  ═══════════════════════════════════════════════════════════════════════ */
+  // Inject styles
   const style = document.createElement('style');
-  style.textContent = `
-  #_cxw {
-    --r : #E31E24; --rd: #c41318;
-    --dk: #1C1C1C; --bg: #FAFAFA;
-    --b1: #e8e8e8; --b2: rgba(0,0,0,.06);
-    --t1: #1C1C1C; --t2: #555; --t3: #aaa;
-    --f : -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-    --sh: 0 12px 40px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.06);
-    font-family: var(--f);
-  }
-  #_cxw, #_cxw * { box-sizing:border-box; margin:0; padding:0; }
-
-  /* ── Keyframes ── */
-  @keyframes _cx-popin {
-    0%  { transform:scale(.5); opacity:0; }
-    65% { transform:scale(1.08); }
-    100%{ transform:scale(1);   opacity:1; }
-  }
-  @keyframes _cx-pulse {
-    0%  { transform:scale(1);   opacity:.5; }
-    100%{ transform:scale(1.7); opacity:0;  }
-  }
-  @keyframes _cx-open {
-    0%  { transform:translateY(16px) scale(.93); opacity:0; }
-    60% { transform:translateY(-2px) scale(1.01); opacity:1; }
-    100%{ transform:translateY(0)    scale(1);    opacity:1; }
-  }
-  @keyframes _cx-close {
-    from{ transform:translateY(0)    scale(1);   opacity:1; }
-    to  { transform:translateY(16px) scale(.93); opacity:0; }
-  }
-  @keyframes _cx-up {
-    from{ transform:translateY(10px); opacity:0; }
-    to  { transform:translateY(0);    opacity:1; }
-  }
-  @keyframes _cx-dot {
-    0%,80%,100%{ transform:translateY(0);   opacity:.4; }
-    40%        { transform:translateY(-5px); opacity:1;  }
-  }
-  @keyframes _cx-badge {
-    0%  { transform:scale(0); }
-    75% { transform:scale(1.3); }
-    100%{ transform:scale(1); }
-  }
-
-  /* ── Launcher bubble ── */
-  #_cx-btn {
-    position:fixed; bottom:26px; right:26px;
-    width:60px; height:60px; border-radius:50%;
-    background:linear-gradient(135deg,#E31E24 0%,#b81419 100%);
-    border:none; outline:none; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    z-index:2147483640;
-    box-shadow:0 4px 20px rgba(227,30,36,.45);
-    animation:_cx-popin .5s cubic-bezier(.34,1.56,.64,1) both;
-    transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
-  }
-  #_cx-btn:hover  { transform:scale(1.1);  box-shadow:0 6px 26px rgba(227,30,36,.6); }
-  #_cx-btn:active { transform:scale(.92); }
-  #_cx-btn::before {
-    content:'';
-    position:absolute; inset:-6px;
-    border-radius:50%;
-    border:2px solid rgba(227,30,36,.5);
-    animation:_cx-pulse 2.2s ease-out infinite;
-  }
-  #_cx-btn.is-open::before { animation:none; opacity:0; }
-  #_cx-btn svg {
-    width:26px; height:26px; fill:#fff; position:absolute;
-    transition:transform .28s cubic-bezier(.34,1.56,.64,1), opacity .2s;
-  }
-  ._cx-ico-chat  { transform:scale(1);  opacity:1; }
-  ._cx-ico-close { transform:scale(0);  opacity:0; }
-  #_cx-btn.is-open ._cx-ico-chat  { transform:rotate(-90deg) scale(0); opacity:0; }
-  #_cx-btn.is-open ._cx-ico-close { transform:scale(1); opacity:1; }
-
-  #_cx-badge {
-    position:absolute; top:-3px; right:-3px;
-    min-width:20px; height:20px; border-radius:10px;
-    background:var(--dk); border:2.5px solid #fff;
-    font-size:10px; font-weight:700; color:#fff;
-    display:none; align-items:center; justify-content:center;
-    padding:0 4px;
-    animation:_cx-badge .3s cubic-bezier(.34,1.56,.64,1);
-  }
-  #_cx-badge.on { display:flex; }
-
-  /* ── Tooltip ── */
-  #_cx-tip {
-    position:fixed; bottom:38px; right:98px;
-    background:#fff; border:1px solid var(--b1);
-    border-radius:12px; padding:10px 15px;
-    box-shadow:0 4px 16px rgba(0,0,0,.08);
-    font-size:13px; font-weight:500; color:var(--t1);
-    white-space:nowrap; pointer-events:none;
-    display:flex; align-items:center; gap:8px;
-    z-index:2147483639;
-    transition:opacity .3s, transform .3s;
-    transform:translateX(0); opacity:1;
-  }
-  #_cx-tip.hidden { opacity:0; transform:translateX(12px); pointer-events:none; }
-  #_cx-tip-dot {
-    width:8px; height:8px; border-radius:50%;
-    background:var(--r); flex-shrink:0;
-  }
-
-  /* ── Panel ── */
-  #_cx-panel {
-    position:fixed; bottom:98px; right:26px;
-    width:400px;
-    display:flex; flex-direction:column;
-    background:#fff;
-    border-radius:20px;
-    box-shadow:var(--sh);
-    border:1px solid rgba(0,0,0,.06);
-    z-index:2147483638;
-    overflow:hidden;
-    opacity:0; pointer-events:none;
-    transform:translateY(16px) scale(.93);
-    transform-origin:bottom right;
-    max-height:calc(100vh - 120px);
-  }
-  #_cx-panel.is-open {
-    pointer-events:all;
-    animation:_cx-open .38s cubic-bezier(.34,1.56,.64,1) forwards;
-  }
-  #_cx-panel.is-close {
-    animation:_cx-close .24s ease forwards;
-  }
-
-  /* ── Header ── */
-  #_cx-head {
-    background:var(--dk);
-    padding:15px 18px;
-    display:flex; align-items:center; justify-content:space-between;
-    border-bottom:2px solid var(--r);
-    flex-shrink:0;
-  }
-  #_cx-head-left { display:flex; align-items:center; gap:12px; }
-  #_cx-avi {
-    width:40px; height:40px; border-radius:11px;
-    background:var(--r);
-    display:flex; align-items:center; justify-content:center;
-    font-size:12px; font-weight:800; color:#fff;
-    letter-spacing:-.5px; flex-shrink:0;
-    box-shadow:0 2px 10px rgba(227,30,36,.4);
-  }
-  #_cx-name {
-    color:#fff; font-size:14.5px; font-weight:700; line-height:1.2;
-    font-family:var(--f);
-  }
-  #_cx-status {
-    display:flex; align-items:center; gap:5px;
-    font-size:11.5px; color:rgba(255,255,255,.5);
-    margin-top:3px; font-family:var(--f);
-  }
-  ._cx-sdot {
-    width:7px; height:7px; border-radius:50%;
-    background:#27c93f;
-    box-shadow:0 0 0 2px rgba(39,201,63,.25);
-    flex-shrink:0;
-  }
-  #_cx-close-btn {
-    background:transparent; border:none; cursor:pointer;
-    color:rgba(255,255,255,.55); padding:6px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    transition:background .2s, color .2s;
-  }
-  #_cx-close-btn:hover { background:rgba(255,255,255,.12); color:#fff; }
-  #_cx-close-btn svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.5; stroke-linecap:round; }
-
-  /* ── Messages ── */
-  #_cx-msgs {
-    flex:1; overflow-y:auto;
-    padding:20px 16px;
-    background:var(--bg);
-    display:flex; flex-direction:column; gap:14px;
-    min-height:300px; max-height:430px;
-    scroll-behavior:smooth;
-  }
-  #_cx-msgs::-webkit-scrollbar { width:3px; }
-  #_cx-msgs::-webkit-scrollbar-thumb { background:rgba(0,0,0,.1); border-radius:3px; }
-
-  /* ── Welcome card ── */
-  ._cx-welcome {
-    background:#fff; border:1px solid var(--b1);
-    border-radius:16px; padding:20px 18px;
-    animation:_cx-up .4s ease both;
-  }
-  ._cx-wtag {
-    display:inline-block;
-    background:#fff5f5; color:var(--r);
-    font-size:10px; font-weight:700; letter-spacing:.07em;
-    text-transform:uppercase; padding:3px 10px;
-    border-radius:20px; margin-bottom:10px;
-    font-family:var(--f);
-  }
-  ._cx-welcome h3 {
-    font-size:14.5px; font-weight:700; color:var(--dk);
-    margin-bottom:6px; line-height:1.35; font-family:var(--f);
-  }
-  ._cx-welcome p { font-size:13px; color:var(--t2); line-height:1.6; font-family:var(--f); margin-top:5px; }
-
-  /* ── Chips ── */
-  ._cx-chips {
-    display:flex; flex-wrap:wrap; gap:8px;
-    animation:_cx-up .4s .1s ease both;
-  }
-  ._cx-chip {
-    background:#fff; border:1.5px solid var(--b1);
-    border-radius:20px; padding:7px 14px;
-    font-size:12px; font-weight:500; color:var(--t1);
-    cursor:pointer; font-family:var(--f);
-    transition:background .18s, border-color .18s, color .18s, transform .15s;
-    white-space:nowrap; line-height:1;
-  }
-  ._cx-chip:hover {
-    background:var(--r); border-color:var(--r);
-    color:#fff; transform:translateY(-1px);
-  }
-
-  /* ── Date divider ── */
-  ._cx-divider {
-    display:flex; align-items:center; gap:10px;
-    font-size:11px; color:var(--t3);
-    animation:_cx-up .4s .2s ease both; font-family:var(--f);
-  }
-  ._cx-divider::before, ._cx-divider::after {
-    content:''; flex:1; height:1px; background:var(--b1);
-  }
-
-  /* ── Message rows ── */
-  ._cx-row {
-    display:flex; align-items:flex-end; gap:9px;
-    animation:_cx-up .28s ease both;
-  }
-  ._cx-row._cx-u { flex-direction:row-reverse; }
-
-  ._cx-av {
-    width:32px; height:32px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0; font-size:13px;
-    font-family:var(--f);
-  }
-  ._cx-row._cx-b ._cx-av {
-    background:var(--dk); font-size:10px;
-    font-weight:800; color:#fff; letter-spacing:-.5px;
-  }
-  ._cx-row._cx-u ._cx-av { background:#fff5f5; }
-
-  ._cx-col { display:flex; flex-direction:column; gap:4px; max-width:84%; }
-  ._cx-row._cx-u ._cx-col { align-items:flex-end; }
-
-  ._cx-bub {
-    padding:13px 16px; border-radius:16px;
-    font-size:13.5px; line-height:1.65;
-    word-break:break-word; overflow-wrap:break-word;
-    font-family:var(--f);
-  }
-  ._cx-row._cx-b ._cx-bub {
-    background:#fff; border:1px solid var(--b2);
-    color:var(--t1); border-bottom-left-radius:4px;
-    box-shadow:0 2px 8px rgba(0,0,0,.05);
-  }
-  ._cx-row._cx-u ._cx-bub {
-    background:var(--dk); color:#fff;
-    border-bottom-right-radius:4px;
-  }
-  ._cx-ts { font-size:10.5px; color:var(--t3); padding:0 4px; font-family:var(--f); }
-
-  /* ── Bubble markdown ── */
-  ._cx-bub strong { font-weight:700; color:#111; }
-  ._cx-bub em     { font-style:italic; }
-  ._cx-bub h3 {
-    font-size:13px; font-weight:700; color:var(--r);
-    margin:10px 0 5px; padding-bottom:4px;
-    border-bottom:1px solid #f0f0f0; font-family:var(--f);
-  }
-  ._cx-bub h3:first-child { margin-top:0; }
-  ._cx-bub ul {
-    margin:8px 0 6px; padding:0;
-    list-style:none; display:flex; flex-direction:column; gap:5px;
-  }
-  ._cx-bub li {
-    padding-left:18px; position:relative;
-    font-size:13.5px; line-height:1.6; font-family:var(--f);
-  }
-  ._cx-bub li::before {
-    content:''; position:absolute; left:2px; top:8px;
-    width:6px; height:6px; border-radius:50%; background:var(--r);
-  }
-  ._cx-bub p { margin:4px 0; }
-  ._cx-bub p:first-child { margin-top:0; }
-  ._cx-bub p:last-child  { margin-bottom:0; }
-
-  /* ── Typing indicator ── */
-  ._cx-typing {
-    display:flex; gap:9px; align-items:flex-end;
-    animation:_cx-up .25s ease both;
-  }
-  ._cx-typing-bub {
-    background:#fff; border:1px solid var(--b2);
-    border-radius:16px; border-bottom-left-radius:4px;
-    padding:13px 17px; display:flex; gap:5px; align-items:center;
-    box-shadow:0 2px 8px rgba(0,0,0,.05);
-  }
-  ._cx-typing-bub span {
-    width:6px; height:6px; border-radius:50%;
-    background:var(--r); display:inline-block;
-    animation:_cx-dot 1.4s infinite ease-in-out;
-  }
-  ._cx-typing-bub span:nth-child(2) { animation-delay:.18s; }
-  ._cx-typing-bub span:nth-child(3) { animation-delay:.36s; }
-
-  /* ── Error banners ── */
-  ._cx-err {
-    font-size:12px; border-radius:10px;
-    padding:10px 14px; text-align:center;
-    align-self:center; max-width:92%;
-    animation:_cx-up .25s ease both; font-family:var(--f);
-    background:#fee2e2; border:1px solid #fca5a5; color:#991b1b;
-  }
-  ._cx-err._cx-rate {
-    background:#fffbeb; border-color:#fcd34d; color:#92400e;
-  }
-  ._cx-err._cx-rate strong { color:#b45309; font-weight:700; }
-
-  /* ── Enquiry CTA card ── */
-  ._cx-cta {
-    background:linear-gradient(135deg,#fff8f8 0%,#fff1f1 100%);
-    border:1px solid rgba(227,30,36,.15);
-    border-radius:14px; padding:16px 16px 14px;
-    display:flex; flex-direction:column; gap:9px;
-    box-shadow:0 4px 15px rgba(227,30,36,.05);
-    align-self:flex-start; max-width:92%;
-    animation:_cx-up .35s .1s ease both;
-  }
-  ._cx-cta-title {
-    font-size:13.5px; font-weight:700; color:var(--dk);
-    display:flex; align-items:center; gap:6px; font-family:var(--f);
-  }
-  ._cx-cta-desc { font-size:12.5px; color:var(--t2); line-height:1.55; font-family:var(--f); }
-  ._cx-cta-btn {
-    display:inline-flex; align-items:center; gap:5px;
-    background:var(--r); color:#fff !important;
-    text-decoration:none !important;
-    font-size:12.5px; font-weight:700; font-family:var(--f);
-    padding:9px 16px; border-radius:9px;
-    transition:background .18s, transform .15s, box-shadow .18s;
-    box-shadow:0 2px 8px rgba(227,30,36,.3);
-    align-self:flex-start; line-height:1;
-  }
-  ._cx-cta-btn:hover {
-    background:var(--rd); transform:translateY(-1px);
-    box-shadow:0 4px 14px rgba(227,30,36,.4);
-  }
-
-  /* ── Chips strip ── */
-  #_cx-chips-strip {
-    padding:10px 14px 12px;
-    background:#fff; border-top:1px solid var(--b1);
-    display:flex; gap:8px; overflow-x:auto;
-    white-space:nowrap; flex-shrink:0;
-    scrollbar-width:none;
-  }
-  #_cx-chips-strip::-webkit-scrollbar { display:none; }
-
-  /* ── Input area ── */
-  #_cx-foot {
-    padding:12px 14px 14px;
-    background:#fff; border-top:1px solid var(--b1);
-    display:flex; flex-direction:column; gap:7px;
-    flex-shrink:0;
-  }
-  #_cx-inp-wrap {
-    display:flex; align-items:center; gap:10px;
-    background:var(--bg); border:1.5px solid var(--b1);
-    border-radius:24px; padding:6px 8px 6px 16px;
-    transition:border-color .2s, box-shadow .2s;
-  }
-  #_cx-inp-wrap:focus-within {
-    border-color:var(--r);
-    box-shadow:0 0 0 3px rgba(227,30,36,.08);
-    background:#fff;
-  }
-  #_cx-inp {
-    flex:1; border:none; background:transparent; outline:none;
-    resize:none; font-family:var(--f);
-    font-size:13.5px; line-height:1.5; color:var(--t1);
-    max-height:110px; min-height:24px; height:24px;
-    padding:3px 0; scrollbar-width:none;
-  }
-  #_cx-inp::-webkit-scrollbar { display:none; }
-  #_cx-inp::placeholder { color:#bbb; }
-  #_cx-send {
-    background:var(--r); border:none; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    width:36px; height:36px; border-radius:50%; flex-shrink:0;
-    box-shadow:0 2px 8px rgba(227,30,36,.35);
-    transition:background .18s, transform .18s, box-shadow .18s;
-  }
-  #_cx-send:hover { background:var(--rd); transform:scale(1.07); box-shadow:0 4px 14px rgba(227,30,36,.45); }
-  #_cx-send:active { transform:scale(.9); }
-  #_cx-send:disabled { background:#ddd; box-shadow:none; cursor:not-allowed; }
-  #_cx-send svg { width:15px; height:15px; fill:#fff; margin-left:1px; }
-  #_cx-pow {
-    font-size:10.5px; color:var(--t3); text-align:center;
-    letter-spacing:.02em; font-family:var(--f);
-  }
-  #_cx-pow b { color:var(--r); font-weight:600; }
-
-  /* ── Mobile ── */
-  @media (max-width:480px) {
-    #_cx-panel {
-      position:fixed; top:0; left:0; right:0; bottom:0;
-      width:100% !important; height:100% !important;
-      max-height:100% !important; border-radius:0 !important;
-    }
-    #_cx-msgs { max-height:calc(100dvh - 210px); }
-    #_cx-btn { right:16px; bottom:16px; }
-    #_cx-tip  { display:none; }
-  }
-  `;
+  style.textContent = ":root {\n  --cx-red: #E31E24;\n  --cx-red-hover: #c41318;\n  --cx-dark: #1C1C1C;\n  --cx-dark-light: #2e2e2e;\n  --cx-gray-bg: #f7f7f7;\n  --cx-border: #e8e8e8;\n  --cx-text-primary: #1C1C1C;\n  --cx-text-secondary: #666666;\n}\n/* ─── CHAT WIDGET STYLES ─── */\n    .cx-widget-container {\n      position: fixed;\n      bottom: 24px;\n      right: 24px;\n      z-index: 9999;\n      display: flex;\n      flex-direction: column;\n      align-items: flex-end;\n      font-family: 'Inter', sans-serif;\n    }\n\n    /* Bubble Launcher */\n    .cx-launcher {\n      width: 60px;\n      height: 60px;\n      border-radius: 50%;\n      background: linear-gradient(135deg, var(--cx-red) 0%, #b81419 100%);\n      box-shadow: 0 4px 20px rgba(227, 30, 36, 0.4);\n      cursor: pointer;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;\n      border: none;\n      outline: none;\n      position: relative;\n    }\n    .cx-launcher:hover {\n      transform: scale(1.08);\n      box-shadow: 0 6px 24px rgba(227, 30, 36, 0.5);\n    }\n    .cx-launcher:active {\n      transform: scale(0.95);\n    }\n    .cx-launcher svg {\n      width: 26px;\n      height: 26px;\n      fill: white;\n      transition: transform 0.3s ease, opacity 0.2s;\n    }\n    .cx-launcher .cx-icon-close {\n      position: absolute;\n      opacity: 0;\n      transform: rotate(-45deg) scale(0.8);\n    }\n    .cx-launcher.open .cx-icon-chat {\n      opacity: 0;\n      transform: rotate(45deg) scale(0.8);\n    }\n    .cx-launcher.open .cx-icon-close {\n      opacity: 1;\n      transform: rotate(0deg) scale(1);\n    }\n\n    /* Notification Badge */\n    .cx-badge {\n      position: absolute;\n      top: -2px;\n      right: -2px;\n      width: 14px;\n      height: 14px;\n      background: #27c93f;\n      border: 2px solid white;\n      border-radius: 50%;\n      animation: cx-pulse 2s infinite;\n    }\n\n    /* Launcher Tooltip */\n    .cx-launcher-tooltip {\n      position: absolute;\n      right: 76px;\n      bottom: 10px;\n      background: white;\n      border: 1px solid var(--cx-border);\n      border-radius: 12px;\n      padding: 10px 16px;\n      box-shadow: 0 4px 15px rgba(0,0,0,0.06);\n      font-size: 13px;\n      font-weight: 500;\n      color: var(--cx-text-primary);\n      white-space: nowrap;\n      pointer-events: none;\n      opacity: 1;\n      transform: translateX(10px);\n      transition: opacity 0.3s, transform 0.3s;\n      display: flex;\n      align-items: center;\n      gap: 8px;\n    }\n    .cx-launcher-tooltip.hidden {\n      opacity: 0;\n      transform: translateX(20px);\n    }\n    .cx-tooltip-dot {\n      width: 8px;\n      height: 8px;\n      background-color: var(--cx-red);\n      border-radius: 50%;\n    }\n\n    /* Chat Panel */\n    .cx-chat-panel {\n      position: absolute;\n      bottom: 76px;\n      right: 0;\n      width: 385px;\n      height: 600px;\n      max-height: calc(100vh - 120px);\n      background: white;\n      border-radius: 20px;\n      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);\n      border: 1px solid rgba(0,0,0,0.05);\n      display: flex;\n      flex-direction: column;\n      overflow: hidden;\n      opacity: 0;\n      transform: translateY(20px) scale(0.95);\n      pointer-events: none;\n      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\n    }\n    .cx-chat-panel.open {\n      opacity: 1;\n      transform: translateY(0) scale(1);\n      pointer-events: all;\n    }\n\n    /* Panel Header */\n    .cx-header {\n      background: var(--cx-dark);\n      padding: 16px 20px;\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      border-bottom: 1px solid rgba(255,255,255,0.08);\n    }\n    .cx-header-info {\n      display: flex;\n      align-items: center;\n      gap: 12px;\n    }\n    .cx-header-avatar {\n      width: 38px;\n      height: 38px;\n      background: var(--cx-red);\n      border-radius: 10px;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      font-weight: 800;\n      font-size: 13px;\n      color: white;\n    }\n    .cx-header-meta {\n      display: flex;\n      flex-direction: column;\n    }\n    .cx-header-title {\n      color: white;\n      font-weight: 700;\n      font-size: 14.5px;\n      line-height: 1.2;\n    }\n    .cx-header-status {\n      display: flex;\n      align-items: center;\n      gap: 6px;\n      font-size: 11.5px;\n      color: rgba(255,255,255,0.5);\n      margin-top: 2px;\n    }\n    .cx-status-dot {\n      width: 7px;\n      height: 7px;\n      background: #27c93f;\n      border-radius: 50%;\n    }\n    .cx-header-actions button {\n      background: transparent;\n      border: none;\n      cursor: pointer;\n      color: rgba(255,255,255,0.6);\n      padding: 6px;\n      border-radius: 50%;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      transition: background 0.2s, color 0.2s;\n    }\n    .cx-header-actions button:hover {\n      background: rgba(255,255,255,0.1);\n      color: white;\n    }\n\n    /* Message Area */\n    .cx-body {\n      flex: 1;\n      padding: 20px;\n      overflow-y: auto;\n      display: flex;\n      flex-direction: column;\n      gap: 16px;\n      background: #FAFAFA;\n      scroll-behavior: smooth;\n    }\n\n    /* Custom Scrollbar for Message Area */\n    .cx-body::-webkit-scrollbar {\n      width: 6px;\n    }\n    .cx-body::-webkit-scrollbar-track {\n      background: transparent;\n    }\n    .cx-body::-webkit-scrollbar-thumb {\n      background-color: rgba(0,0,0,0.1);\n      border-radius: 10px;\n    }\n\n    /* Chat Bubbles */\n    .cx-msg-wrapper {\n      display: flex;\n      flex-direction: column;\n      max-width: 82%;\n      animation: cx-fade-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;\n    }\n    .cx-msg-wrapper.bot {\n      align-self: flex-start;\n    }\n    .cx-msg-wrapper.user {\n      align-self: flex-end;\n    }\n\n    .cx-msg-bubble {\n      padding: 12px 16px;\n      border-radius: 16px;\n      font-size: 13.5px;\n      line-height: 1.5;\n      word-wrap: break-word;\n    }\n    .bot .cx-msg-bubble {\n      background: white;\n      color: var(--cx-text-primary);\n      border-bottom-left-radius: 4px;\n      box-shadow: 0 2px 8px rgba(0,0,0,0.03);\n      border: 1px solid rgba(0,0,0,0.04);\n    }\n    .user .cx-msg-bubble {\n      background: var(--cx-red);\n      color: white;\n      border-bottom-right-radius: 4px;\n      box-shadow: 0 4px 12px rgba(227, 30, 36, 0.15);\n    }\n\n    .cx-msg-timestamp {\n      font-size: 10px;\n      color: #999;\n      margin-top: 4px;\n      margin-left: 4px;\n    }\n    .user .cx-msg-timestamp {\n      align-self: flex-end;\n      margin-right: 4px;\n    }\n\n    /* Markdown Styling in Bot Bubbles */\n    .cx-msg-bubble strong, .cx-msg-bubble b {\n      font-weight: 700;\n      color: #000;\n    }\n    .cx-msg-bubble p {\n      margin-bottom: 8px;\n    }\n    .cx-msg-bubble p:last-child {\n      margin-bottom: 0;\n    }\n    .cx-msg-bubble ul, .cx-msg-bubble ol {\n      padding-left: 18px;\n      margin: 8px 0;\n    }\n    .cx-msg-bubble li {\n      margin-bottom: 4px;\n    }\n\n    /* Dynamic Typing Indicator */\n    .cx-typing-bubble {\n      display: flex;\n      align-items: center;\n      gap: 5px;\n      padding: 12px 18px;\n      background: white;\n      border-radius: 16px;\n      border-bottom-left-radius: 4px;\n      box-shadow: 0 2px 8px rgba(0,0,0,0.03);\n      border: 1px solid rgba(0,0,0,0.04);\n      width: fit-content;\n      align-self: flex-start;\n      margin-bottom: 12px;\n    }\n    .cx-typing-dot {\n      width: 7px;\n      height: 7px;\n      background: #c0c0c0;\n      border-radius: 50%;\n      animation: cx-bounce 1.4s infinite ease-in-out both;\n    }\n    .cx-typing-dot:nth-child(1) { animation-delay: -0.32s; }\n    .cx-typing-dot:nth-child(2) { animation-delay: -0.16s; }\n\n    /* Action CTA Card */\n    .cx-cta-card {\n      background: linear-gradient(135deg, #FFF8F8 0%, #FFF1F1 100%);\n      border: 1px solid rgba(227, 30, 36, 0.15);\n      border-radius: 14px;\n      padding: 16px;\n      margin-top: 8px;\n      display: flex;\n      flex-direction: column;\n      gap: 12px;\n      box-shadow: 0 4px 15px rgba(227, 30, 36, 0.04);\n      align-self: flex-start;\n      max-width: 90%;\n      animation: cx-fade-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;\n    }\n    .cx-cta-title {\n      font-size: 13.5px;\n      font-weight: 700;\n      color: var(--cx-dark);\n      display: flex;\n      align-items: center;\n      gap: 6px;\n    }\n    .cx-cta-desc {\n      font-size: 12px;\n      color: #555;\n      line-height: 1.5;\n    }\n    .cx-cta-btn {\n      background: var(--cx-red);\n      color: white;\n      border: none;\n      border-radius: 8px;\n      padding: 8px 14px;\n      font-size: 12.5px;\n      font-weight: 600;\n      cursor: pointer;\n      transition: background 0.2s, transform 0.1s;\n      text-align: center;\n      display: inline-block;\n      text-decoration: none;\n    }\n    .cx-cta-btn:hover {\n      background: var(--cx-red-hover);\n    }\n    .cx-cta-btn:active {\n      transform: scale(0.98);\n    }\n\n    /* Quick Action Chips */\n    .cx-chips-container {\n      padding: 10px 14px;\n      background: white;\n      border-top: 1px solid var(--cx-border);\n      display: flex;\n      gap: 8px;\n      overflow-x: auto;\n      white-space: nowrap;\n      scroll-behavior: smooth;\n    }\n    .cx-chips-container::-webkit-scrollbar {\n      display: none; /* Hide default scrollbar for sleek iOS-style swipe */\n    }\n    .cx-chip {\n      background: #f1f1f1;\n      border: 1px solid #e2e2e2;\n      color: #444;\n      font-size: 12px;\n      font-weight: 500;\n      padding: 8px 14px;\n      border-radius: 18px;\n      cursor: pointer;\n      transition: background 0.2s, border-color 0.2s, transform 0.1s;\n      display: inline-block;\n      flex-shrink: 0;\n    }\n    .cx-chip:hover {\n      background: #e8e8e8;\n      border-color: #d0d0d0;\n      transform: translateY(-1px);\n    }\n    .cx-chip:active {\n      transform: translateY(0);\n    }\n\n    /* Footer Input Area */\n    .cx-input-area {\n      padding: 12px 16px 16px;\n      background: white;\n      border-top: 1px solid var(--cx-border);\n      display: flex;\n      flex-direction: column;\n      gap: 8px;\n    }\n    .cx-input-box-wrapper {\n      display: flex;\n      align-items: flex-end;\n      gap: 10px;\n      background: #FAFAFA;\n      border: 1.5px solid var(--cx-border);\n      border-radius: 14px;\n      padding: 6px 12px 6px 14px;\n      transition: border-color 0.2s, box-shadow 0.2s;\n    }\n    .cx-input-box-wrapper:focus-within {\n      border-color: var(--cx-red);\n      box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.08);\n      background: white;\n    }\n\n    /* Auto-growing Textarea */\n    .cx-textarea {\n      flex: 1;\n      border: none;\n      background: transparent;\n      outline: none;\n      resize: none;\n      font-family: inherit;\n      font-size: 13.5px;\n      line-height: 1.5;\n      color: var(--cx-text-primary);\n      max-height: 110px;\n      min-height: 24px;\n      height: 24px;\n      padding: 3px 0;\n    }\n    .cx-textarea::placeholder {\n      color: #aaa;\n    }\n\n    /* Send Button */\n    .cx-send-btn {\n      background: transparent;\n      border: none;\n      cursor: pointer;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      width: 34px;\n      height: 34px;\n      border-radius: 50%;\n      transition: background 0.2s, transform 0.1s;\n      color: #999;\n      flex-shrink: 0;\n    }\n    .cx-send-btn.active {\n      color: var(--cx-red);\n      background: rgba(227, 30, 36, 0.06);\n    }\n    .cx-send-btn.active:hover {\n      background: rgba(227, 30, 36, 0.1);\n      transform: scale(1.05);\n    }\n    .cx-send-btn svg {\n      width: 18px;\n      height: 18px;\n      fill: currentColor;\n    }\n\n    .cx-footer-note {\n      font-size: 10px;\n      color: rgba(0,0,0,0.5);\n      text-align: center;\n      line-height: 1.2;\n    }\n\n    /* ─── ENQUIRY FORM MODAL ─── */\n    .cx-modal {\n      position: fixed;\n      top: 0; left: 0; right: 0; bottom: 0;\n      background: rgba(0,0,0,0.5);\n      backdrop-filter: blur(4px);\n      z-index: 100000;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      opacity: 0;\n      pointer-events: none;\n      transition: opacity 0.3s ease;\n      padding: 16px;\n    }\n    .cx-modal.open {\n      opacity: 1;\n      pointer-events: all;\n    }\n    .cx-modal-card {\n      background: white;\n      border-radius: 20px;\n      width: 100%;\n      max-width: 420px;\n      box-shadow: 0 20px 50px rgba(0,0,0,0.3);\n      overflow: hidden;\n      transform: scale(0.9) translateY(20px);\n      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\n    }\n    .cx-modal.open .cx-modal-card {\n      transform: scale(1) translateY(0);\n    }\n    .cx-modal-header {\n      background: var(--cx-dark);\n      padding: 20px 24px;\n      color: white;\n      position: relative;\n    }\n    .cx-modal-header h3 {\n      font-size: 16px;\n      font-weight: 700;\n      margin-bottom: 4px;\n    }\n    .cx-modal-header p {\n      color: rgba(255,255,255,0.6);\n      font-size: 12px;\n    }\n    .cx-modal-close {\n      position: absolute;\n      top: 20px;\n      right: 20px;\n      background: transparent;\n      border: none;\n      color: rgba(255,255,255,0.6);\n      cursor: pointer;\n      transition: color 0.2s;\n    }\n    .cx-modal-close:hover {\n      color: white;\n    }\n    .cx-modal-body {\n      padding: 24px;\n      display: flex;\n      flex-direction: column;\n      gap: 16px;\n    }\n    .cx-form-group {\n      display: flex;\n      flex-direction: column;\n      gap: 6px;\n    }\n    .cx-form-group label {\n      font-size: 12.5px;\n      font-weight: 600;\n      color: var(--cx-text-primary);\n    }\n    .cx-form-group input, .cx-form-group select {\n      padding: 10px 14px;\n      border: 1.5px solid var(--cx-border);\n      border-radius: 10px;\n      font-size: 13.5px;\n      font-family: inherit;\n      outline: none;\n      transition: border-color 0.2s;\n    }\n    .cx-form-group input:focus, .cx-form-group select:focus {\n      border-color: var(--cx-red);\n    }\n    .cx-form-submit {\n      background: var(--cx-red);\n      color: white;\n      border: none;\n      border-radius: 10px;\n      padding: 12px;\n      font-size: 14px;\n      font-weight: 600;\n      cursor: pointer;\n      transition: background 0.2s;\n      margin-top: 8px;\n    }\n    .cx-form-submit:hover {\n      background: var(--cx-red-hover);\n    }\n\n    /* Mock Error Banner inside panel */\n    .cx-error-banner {\n      background: #FEE2E2;\n      border: 1px solid #FCA5A5;\n      border-radius: 10px;\n      padding: 10px 14px;\n      font-size: 12px;\n      color: #991B1B;\n      margin-bottom: 8px;\n      align-self: center;\n      text-align: center;\n      max-width: 90%;\n      animation: cx-fade-slide 0.3s ease;\n    }\n\n    /* ── Animations ── */\n    @keyframes cx-bounce {\n      0%, 80%, 100% { transform: scale(0); }\n      40% { transform: scale(1.0); }\n    }\n    @keyframes cx-pulse {\n      0% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.7); }\n      70% { box-shadow: 0 0 0 6px rgba(39, 201, 63, 0); }\n      100% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }\n    }\n    @keyframes cx-fade-slide {\n      from {\n        opacity: 0;\n        transform: translateY(8px);\n      }\n      to {\n        opacity: 1;\n        transform: translateY(0);\n      }\n    }\n\n    /* ── Responsive Adjustment ── */\n    @media (max-width: 640px) {\n      .cx-widget-container {\n        bottom: 16px;\n        right: 16px;\n      }\n      .cx-launcher-tooltip {\n        display: none; /* Hide tooltip on small mobile screens */\n      }\n      .cx-chat-panel {\n        position: fixed;\n        bottom: 0 !important;\n        right: 0 !important;\n        top: 0 !important;\n        left: 0 !important;\n        width: 100% !important;\n        height: 100% !important;\n        max-height: 100% !important;\n        border-radius: 0 !important;\n        z-index: 100000;\n      }\n      .cx-header {\n        padding: 14px 16px;\n      }\n      nav {\n        padding: 0 20px;\n      }\n      .hero {\n        padding: 60px 20px;\n      }\n      main {\n        padding: 40px 16px 80px;\n      }\n    }\n  \n/* Rate-limit countdown banner (amber) */\n.cx-rate-banner {\n  background: #fffbeb !important;\n  border-color: #fcd34d !important;\n  color: #92400e !important;\n}\n.cx-rate-banner strong { color: #b45309; font-weight: 700; }\n";
   document.head.appendChild(style);
 
-  /* ═══════════════════════════════════════════════════════════════════════
-     HTML
-  ═══════════════════════════════════════════════════════════════════════ */
+  // Inject HTML
   const root = document.createElement('div');
-  root.id = '_cxw';
-  root.innerHTML = `
-    <!-- Tooltip -->
-    <div id="_cx-tip"><span id="_cx-tip-dot"></span>Ask Caddxpert AI Advisor</div>
-
-    <!-- Panel -->
-    <div id="_cx-panel" role="dialog" aria-label="Caddxpert AI Assistant">
-
-      <!-- Header -->
-      <div id="_cx-head">
-        <div id="_cx-head-left">
-          <div id="_cx-avi">CX</div>
-          <div>
-            <div id="_cx-name">Caddxpert AI Advisor</div>
-            <div id="_cx-status"><span class="_cx-sdot"></span>Online · Powered by Gemini</div>
-          </div>
-        </div>
-        <button id="_cx-close-btn" aria-label="Close chat">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-
-      <!-- Messages -->
-      <div id="_cx-msgs" aria-live="polite"></div>
-
-      <!-- Quick chips strip -->
-      <div id="_cx-chips-strip"></div>
-
-      <!-- Input -->
-      <div id="_cx-foot">
-        <div id="_cx-inp-wrap">
-          <textarea id="_cx-inp" rows="1" placeholder="Type a message…" maxlength="500" autocomplete="off" aria-label="Message"></textarea>
-          <button id="_cx-send" aria-label="Send">
-            <svg viewBox="0 0 24 24"><path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/></svg>
-          </button>
-        </div>
-        <div id="_cx-pow">Powered by <b>Caddxpert AI Innovations</b> · Press Enter to send</div>
-      </div>
-    </div>
-
-    <!-- Launcher -->
-    <button id="_cx-btn" aria-label="Open Caddxpert AI chat">
-      <svg class="_cx-ico-chat"  viewBox="0 0 24 24"><path d="M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.2L4,17.2V4h16V16z M7,9h10v2H7V9z M7,5h10v2H7V5z M7,13h7v2H7V13z"/></svg>
-      <svg class="_cx-ico-close" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
-      <div id="_cx-badge"></div>
-    </button>
-  `;
+  root.innerHTML = "<!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->\n<div class=\"cx-widget-container\" id=\"cxWidget\">\n  \n  <!-- Tooltip hint -->\n  <div class=\"cx-launcher-tooltip\" id=\"cxTooltip\">\n    <span class=\"cx-tooltip-dot\"></span>\n    Ask Caddxpert AI Advisor\n  </div>\n\n  <!-- Chat Panel -->\n  <div class=\"cx-chat-panel\" id=\"cxPanel\">\n    <!-- Header -->\n    <div class=\"cx-header\">\n      <div class=\"cx-header-info\">\n        <div class=\"cx-header-avatar\">CX</div>\n        <div class=\"cx-header-meta\">\n          <span class=\"cx-header-title\">Caddxpert AI Advisor</span>\n          <div class=\"cx-header-status\">\n            <span class=\"cx-status-dot\"></span>\n            <span>Online • Powered by Cad Point</span>\n          </div>\n        </div>\n      </div>\n      <div class=\"cx-header-actions\">\n        <!-- Close / Minimize -->\n        <button id=\"cxCloseBtn\" title=\"Minimize Chat\">\n          <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n            <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n            <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n          </svg>\n        </button>\n      </div>\n    </div>\n\n    <!-- Messages Container -->\n    <div class=\"cx-body\" id=\"cxMessages\">\n      <!-- Welcome message -->\n      <div class=\"cx-msg-wrapper bot\">\n        <div class=\"cx-msg-bubble\">\n          👋 Welcome to <strong>Caddxpert AI Innovations</strong> (Powered by CAD Point)! \n          <p style=\"margin-top: 8px;\">I can guide you through our professional certificate programs in CAD, MEP, Civil Architecture, Mechanical, and Software Engineering.</p>\n          <p style=\"margin-top: 8px;\">How can I help you shape your engineering career today?</p>\n        </div>\n        <div class=\"cx-msg-timestamp\" id=\"cxWelcomeTime\">12:00 PM</div>\n      </div>\n    </div>\n\n    <!-- Quick action chips -->\n    <div class=\"cx-chips-container\" id=\"cxChips\">\n      <div class=\"cx-chip\" data-msg=\"Which CAD/Engineering courses do you offer?\">CAD Courses 📐</div>\n      <div class=\"cx-chip\" data-msg=\"Are there placements after course completion?\">Placements 💼</div>\n      <div class=\"cx-chip\" data-msg=\"What are the course fees and durations?\">Fees &amp; Duration 💰</div>\n      <div class=\"cx-chip\" data-msg=\"Can I speak to a counselor for career advice?\">Free Counselling 📞</div>\n    </div>\n\n    <!-- Message input area -->\n    <div class=\"cx-input-area\">\n      <div class=\"cx-input-box-wrapper\">\n        <textarea \n          class=\"cx-textarea\" \n          id=\"cxTextarea\" \n          placeholder=\"Type a message...\" \n          rows=\"1\"\n          autocomplete=\"off\"\n        ></textarea>\n        <button class=\"cx-send-btn\" id=\"cxSendBtn\" title=\"Send message\">\n          <svg viewBox=\"0 0 24 24\">\n            <path d=\"M2,21L23,12L2,3V10L17,12L2,14V21Z\" />\n          </svg>\n        </button>\n      </div>\n      <div class=\"cx-footer-note\">\n        Our AI answers immediately. Press Enter to Send.\n      </div>\n    </div>\n  </div>\n\n  <!-- Launcher bubble -->\n  <button class=\"cx-launcher\" id=\"cxLauncher\">\n    <div class=\"cx-badge\"></div>\n    <!-- Chat Icon -->\n    <svg class=\"cx-icon-chat\" viewBox=\"0 0 24 24\">\n      <path d=\"M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.2L4,17.2V4h16V16z M7,9h10v2H7V9z M7,5h10v2H7V5z M7,13h7v2H7V13z\"/>\n    </svg>\n    <!-- Close Icon -->\n    <svg class=\"cx-icon-close\" viewBox=\"0 0 24 24\">\n      <path d=\"M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z\"/>\n    </svg>\n  </button>\n</div>";
   document.body.appendChild(root);
 
-  /* ── DOM refs ─────────────────────────────────────────────────────────── */
-  const btn    = document.getElementById('_cx-btn');
-  const panel  = document.getElementById('_cx-panel');
-  const msgs   = document.getElementById('_cx-msgs');
-  const inp    = document.getElementById('_cx-inp');
-  const snd    = document.getElementById('_cx-send');
-  const badge  = document.getElementById('_cx-badge');
-  const tip    = document.getElementById('_cx-tip');
-  const strip  = document.getElementById('_cx-chips-strip');
+  // ── Widget DOM Elements ──
+  const launcher = document.getElementById('cxLauncher');
+  const panel = document.getElementById('cxPanel');
+  const closeBtn = document.getElementById('cxCloseBtn');
+  const tooltip = document.getElementById('cxTooltip');
+  const messagesContainer = document.getElementById('cxMessages');
+  const textarea = document.getElementById('cxTextarea');
+  const sendBtn = document.getElementById('cxSendBtn');
+  const chipsContainer = document.getElementById('cxChips');
+  const welcomeTime = document.getElementById('cxWelcomeTime');
 
-  /* ── Helpers ─────────────────────────────────────────────────────────── */
-  const ts    = () => new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-  const scrl  = () => { msgs.scrollTop = msgs.scrollHeight; };
-  const isCtx = t => COURSE_KW.some(k => t.toLowerCase().includes(k));
+  const now = new Date();
+  if(welcomeTime) welcomeTime.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-  /* ── Welcome screen ──────────────────────────────────────────────────── */
-  (function welcome() {
-    const wc = document.createElement('div');
-    wc.className = '_cx-welcome';
-    wc.innerHTML = `
-      <div class="_cx-wtag">AI Assistant</div>
-      <h3>Hi there! 👋 Welcome to Caddxpert</h3>
-      <p>I can guide you through our professional courses in CAD, MEP, Civil, Mechanical, and more.</p>
-      <p>How can I help shape your engineering career today?</p>
-    `;
-    msgs.appendChild(wc);
+  let isChatOpen = false;
+  let isGenerating = false;
+  let chatHistory = [];
 
-    const div = document.createElement('div');
-    div.className = '_cx-divider';
-    div.textContent = 'Today';
-    msgs.appendChild(div);
-
-    [
-      ['📐 CAD Courses',      'Which CAD/Engineering courses do you offer?'],
-      ['💼 Placements',       'Are there placements after course completion?'],
-      ['💰 Fees & Duration',  'What are the course fees and durations?'],
-      ['📞 Free Counselling', 'Can I speak to a counselor for career advice?'],
-    ].forEach(([label, msg]) => {
-      const c = document.createElement('button');
-      c.className = '_cx-chip';
-      c.textContent = label;
-      c.addEventListener('click', () => { if (!busy) send(msg); });
-      strip.appendChild(c);
-    });
-  })();
-
-  /* ── Panel toggle ────────────────────────────────────────────────────── */
-  let unread = 0;
-  function openPanel() {
-    chatOpen = true;
-    btn.classList.add('is-open');
-    panel.classList.remove('is-close');
-    panel.classList.add('is-open');
-    tip.classList.add('hidden');
-    badge.classList.remove('on'); unread = 0;
-    setTimeout(() => inp.focus(), 320);
-    scrl();
-  }
-  function closePanel() {
-    chatOpen = false;
-    btn.classList.remove('is-open');
-    panel.classList.remove('is-open');
-    panel.classList.add('is-close');
-    setTimeout(() => panel.classList.remove('is-close'), 260);
-  }
-  btn.addEventListener('click', () => chatOpen ? closePanel() : openPanel());
-  document.getElementById('_cx-close-btn').addEventListener('click', closePanel);
-  setTimeout(() => { if (!chatOpen) tip.classList.add('hidden'); }, 7000);
-
-  /* ── Textarea auto-grow ──────────────────────────────────────────────── */
-  inp.addEventListener('input', () => {
-    inp.style.height = 'auto';
-    inp.style.height = Math.min(inp.scrollHeight, 110) + 'px';
-  });
-  inp.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
-  });
-  snd.addEventListener('click', handleSend);
-
-  function handleSend() {
-    const text = inp.value.trim();
-    if (!text || busy) return;
-    inp.value = '';
-    inp.style.height = '24px';
-    send(text);
-  }
-
-  /* ── Markdown parser ─────────────────────────────────────────────────── */
-  function md(raw) {
-    if (!raw) return '';
-    const esc = raw
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const lines = esc.split('\n');
-    const out = []; let list = false;
-    for (const line of lines) {
-      const t = line.trim();
-      if (/^\*\*(.+)\*\*[:\s]*$/.test(t)) {
-        if (list) { out.push('</ul>'); list = false; }
-        out.push(`<h3>${t.replace(/^\*\*(.+?)\*\*[:\s]*$/,'$1')}</h3>`);
-      } else if (/^[*\-]\s/.test(line)) {
-        if (!list) { out.push('<ul>'); list = true; }
-        out.push(`<li>${fmt(line.replace(/^[*\-]\s+/,''))}</li>`);
-      } else if (/^#{1,3}\s/.test(t)) {
-        if (list) { out.push('</ul>'); list = false; }
-        out.push(`<h3>${fmt(t.replace(/^#{1,3}\s/,''))}</h3>`);
-      } else {
-        if (list) { out.push('</ul>'); list = false; }
-        if (!t) out.push('<br>');
-        else    out.push(`<p>${fmt(t)}</p>`);
-      }
+  function toggleChat() {
+    isChatOpen = !isChatOpen;
+    launcher.classList.toggle('open', isChatOpen);
+    panel.classList.toggle('open', isChatOpen);
+    if (isChatOpen) {
+      tooltip.classList.add('hidden');
+      if (window.innerWidth > 640) setTimeout(() => textarea.focus(), 300);
+      scrollChatToBottom();
     }
-    if (list) out.push('</ul>');
-    return out.join('');
-  }
-  function fmt(t) {
-    return t
-      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g,'<em>$1</em>');
   }
 
-  /* ── Append message ──────────────────────────────────────────────────── */
-  function appendMsg(text, role) {
-    const row = document.createElement('div');
-    row.className = `_cx-row ${role==='user' ? '_cx-u' : '_cx-b'}`;
+  setTimeout(() => { if (!isChatOpen) tooltip.classList.add('hidden'); }, 7000);
+  launcher.addEventListener('click', toggleChat);
+  closeBtn.addEventListener('click', toggleChat);
 
-    const av = document.createElement('div');
-    av.className = '_cx-av';
-    av.textContent = role === 'user' ? '🧑' : 'CX';
+  textarea.addEventListener('input', () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight - 6, 110) + 'px';
+    if (textarea.value.trim().length > 0) sendBtn.classList.add('active');
+    else sendBtn.classList.remove('active');
+  });
 
-    const col = document.createElement('div');
-    col.className = '_cx-col';
+  textarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserSend(); }
+  });
+  sendBtn.addEventListener('click', handleUserSend);
 
-    const bub = document.createElement('div');
-    bub.className = '_cx-bub';
-    bub.innerHTML = role === 'bot' ? md(text) : escHtml(text);
-
-    const time = document.createElement('div');
-    time.className = '_cx-ts';
-    time.textContent = ts();
-
-    col.appendChild(bub); col.appendChild(time);
-    row.appendChild(av);  row.appendChild(col);
-    msgs.appendChild(row); scrl();
-    return row;
+  function parseMarkdown(text) {
+    if (!text) return '';
+    let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    html = html.replace(/^### (.*$)/gim, '<h4 style="font-weight:700; margin-top:8px; margin-bottom:4px;">$1</h4>');
+    html = html.replace(/^## (.*$)/gim, '<h3 style="font-weight:700; margin-top:10px; margin-bottom:4px;">$1</h3>');
+    html = html.replace(/^# (.*$)/gim, '<h2 style="font-weight:700; margin-top:12px; margin-bottom:6px;">$1</h2>');
+    html = html.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>');
+    html = html.replace(/\\*(.*?)\\*/g, '<em>$1</em>');
+    html = html.replace(/^\\s*\\n\\*/gm, '~');
+    html = html.replace(/^-\\s+(.*)/gim, '<li>$1</li>');
+    html = html.replace(/^\\s*\\*\\s+(.*)/gim, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\\/li>)/gim, '<ul style="margin:6px 0; padding-left:16px;">$1</ul>');
+    html = html.replace(/<\\/ul>\\s*<ul style="margin:6px 0; padding-left:16px;">/g, '');
+    html = html.replace(/\\n/g, '<br>');
+    return html;
   }
 
-  function escHtml(s) {
-    return s.replace(/[&<>'"]/g,
-      c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]||c));
+  function addMessageToUI(sender, text) {
+    const msgWrapper = document.createElement('div');
+    msgWrapper.className = 'cx-msg-wrapper ' + sender;
+    const msgBubble = document.createElement('div');
+    msgBubble.className = 'cx-msg-bubble';
+    msgBubble.innerHTML = sender === 'bot' ? parseMarkdown(text) : escapeHTML(text);
+    const timestamp = document.createElement('div');
+    timestamp.className = 'cx-msg-timestamp';
+    timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    msgWrapper.appendChild(msgBubble);
+    msgWrapper.appendChild(timestamp);
+    messagesContainer.appendChild(msgWrapper);
+    scrollChatToBottom();
   }
 
-  /* ── Typing indicator ────────────────────────────────────────────────── */
-  let typEl = null;
-  function showTyping() {
-    if (typEl) return;
-    typEl = document.createElement('div');
-    typEl.className = '_cx-typing';
-    const av = document.createElement('div');
-    av.className = '_cx-av _cx-b'; av.textContent = 'CX';
-    const bub = document.createElement('div');
-    bub.className = '_cx-typing-bub';
-    bub.innerHTML = '<span></span><span></span><span></span>';
-    typEl.appendChild(av); typEl.appendChild(bub);
-    msgs.appendChild(typEl); scrl();
-  }
-  function hideTyping() { if (typEl) { typEl.remove(); typEl = null; } }
-
-  /* ── CTA card ────────────────────────────────────────────────────────── */
-  function showCTA() {
-    const old = msgs.querySelector('._cx-cta');
-    if (old) old.remove();
-    const card = document.createElement('div');
-    card.className = '_cx-cta';
-    card.innerHTML = `
-      <div class="_cx-cta-title">🎓 Free Counselling &amp; Admission Guidance</div>
-      <div class="_cx-cta-desc">Talk to our expert advisors and find the best course for your goals.</div>
-      <a class="_cx-cta-btn" href="${ENQUIRY}" target="_blank" rel="noopener">
-        Register for Free Consultation →
-      </a>
-    `;
-    msgs.appendChild(card); scrl();
+  function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t));
   }
 
-  /* ── Error banners ───────────────────────────────────────────────────── */
-  function showErr(text) {
-    const el = document.createElement('div');
-    el.className = '_cx-err';
-    el.textContent = '⚠️ ' + text;
-    msgs.appendChild(el); scrl();
+  function scrollChatToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  chipsContainer.addEventListener('click', (e) => {
+    const chip = e.target.closest('.cx-chip');
+    if (!chip || isGenerating) return;
+    const chipMessage = chip.getAttribute('data-msg');
+    if (chipMessage) { sendUserMessage(chipMessage); }
+  });
+
+  function handleUserSend() {
+    const msg = textarea.value.trim();
+    if (!msg || isGenerating) return;
+    sendUserMessage(msg);
+    textarea.value = '';
+    textarea.style.height = '24px';
+    sendBtn.classList.remove('active');
+  }
+
+  let typingBubbleRef = null;
+  function showTypingIndicator() {
+    if (typingBubbleRef) return;
+    typingBubbleRef = document.createElement('div');
+    typingBubbleRef.className = 'cx-typing-bubble';
+    typingBubbleRef.innerHTML = '<span class="cx-typing-dot"></span><span class="cx-typing-dot"></span><span class="cx-typing-dot"></span>';
+    messagesContainer.appendChild(typingBubbleRef);
+    scrollChatToBottom();
+  }
+  function removeTypingIndicator() {
+    if (typingBubbleRef) { typingBubbleRef.remove(); typingBubbleRef = null; }
+  }
+
+  function triggerSmartCTA(textContext) {
+    const lowercase = textContext.toLowerCase();
+    const triggers = ['course', 'fee', 'admission', 'learn', 'placement', 'class', 'counsel', 'price', 'consult', 'duration', 'career', 'force-show'];
+    if (triggers.some(t => lowercase.includes(t))) {
+      const existingCTA = messagesContainer.querySelector('.cx-cta-card');
+      if (existingCTA) existingCTA.remove();
+      setTimeout(() => {
+        const ctaCard = document.createElement('div');
+        ctaCard.className = 'cx-cta-card';
+        ctaCard.innerHTML = \`<div class="cx-cta-title"><span>🎓</span> Free Counselling & Admission Guidance</div><div class="cx-cta-desc">Get an instant callback from our expert senior career advisors and secure special discounts on standard course fees.</div><a class="cx-cta-btn" href="\${ENQUIRY}" target="_blank" rel="noopener" style="text-decoration:none;">Book Counseling Now</a>\`;
+        messagesContainer.appendChild(ctaCard);
+        scrollChatToBottom();
+      }, 600);
+    }
+  }
+
+  function showInChatError(msg) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'cx-error-banner';
+    errorDiv.innerText = msg;
+    messagesContainer.appendChild(errorDiv);
+    scrollChatToBottom();
   }
 
   function showRateLimit() {
     let secs = 60;
     const el = document.createElement('div');
-    el.className = '_cx-err _cx-rate';
-    el.innerHTML = `⏳ Too many messages. Please wait <strong id="_cx-cd">${secs}s</strong> and try again.`;
-    msgs.appendChild(el); scrl();
+    el.className = 'cx-error-banner cx-rate-banner';
+    el.innerHTML = \`⏳ Too many messages. Please wait <strong id="cxCountdown">\${secs}s</strong> before sending again.\`;
+    messagesContainer.appendChild(el);
+    scrollChatToBottom();
 
-    snd.disabled = true; inp.disabled = true;
-    inp.placeholder = `Please wait ${secs}s…`;
+    sendBtn.disabled = true;
+    textarea.disabled = true;
+    textarea.placeholder = \`Please wait \${secs}s…\`;
 
-    const t = setInterval(() => {
+    const tick = setInterval(() => {
       secs--;
-      const cd = document.getElementById('_cx-cd');
+      const cd = document.getElementById('cxCountdown');
       if (cd) cd.textContent = secs + 's';
-      inp.placeholder = `Please wait ${secs}s…`;
+      textarea.placeholder = \`Please wait \${secs}s…\`;
+
       if (secs <= 0) {
-        clearInterval(t);
-        snd.disabled = false; inp.disabled = false;
-        inp.placeholder = 'Type a message…';
+        clearInterval(tick);
+        sendBtn.disabled = false;
+        textarea.disabled = false;
+        textarea.placeholder = 'Type a message...';
         if (el.parentNode) el.remove();
-        inp.focus();
+        textarea.focus();
       }
     }, 1000);
   }
 
-  /* ── Core send ───────────────────────────────────────────────────────── */
-  async function send(text) {
-    if (busy) return;
-    busy = true; snd.disabled = true;
+  async function sendUserMessage(msgText) {
+    addMessageToUI('user', msgText);
+    chatHistory.push({ role: 'user', text: msgText });
+    if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
 
-    appendMsg(text, 'user');
-    history.push({ role:'user', text });
-    if (history.length > 6) history = history.slice(-6);
-
-    showTyping();
+    showTypingIndicator();
+    isGenerating = true;
+    sendBtn.disabled = true;
 
     try {
-      const res = await fetch(`${BASE_URL}/chat`, {
+      const res = await fetch(\`\${BASE_URL}/chat\`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history: history.slice(0,-1) })
+        body: JSON.stringify({ message: msgText, history: chatHistory.slice(0, -1) })
       });
 
-      hideTyping();
+      removeTypingIndicator();
 
-      if (res.status === 429) { showRateLimit(); return; }
-
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({}));
-        throw new Error(e.error || `HTTP ${res.status}`);
+      if (res.status === 429) {
+        showRateLimit();
+        return;
       }
+
+      if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
 
       const { reply = "I'm unable to respond right now." } = await res.json();
-      appendMsg(reply, 'bot');
-      history.push({ role:'model', text:reply });
-      if (history.length > 6) history = history.slice(-6);
-
-      if (isCtx(text)) setTimeout(showCTA, 450);
-
-      if (!chatOpen) {
-        unread++;
-        badge.textContent = unread > 9 ? '9+' : unread;
-        badge.classList.add('on');
-      }
-
+      addMessageToUI('bot', reply);
+      chatHistory.push({ role: 'model', text: reply });
+      if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
+      
+      triggerSmartCTA(msgText + " " + reply);
     } catch (err) {
-      hideTyping();
-      showErr('Connection trouble. Please try again or call +91 82484 90202.');
-      console.error('[CXW]', err);
+      removeTypingIndicator();
+      showInChatError("Connection trouble. Please try again or call +91 82484 90202.");
+      console.error(err);
     } finally {
-      busy = false; snd.disabled = false;
+      isGenerating = false;
+      sendBtn.disabled = false;
+      textarea.focus();
     }
   }
 
 })();
+`;
+
+fs.writeFileSync('public/widget.js', jsContent);
+console.log('Saved public/widget.js with exact UI!');
