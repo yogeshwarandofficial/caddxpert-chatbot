@@ -28,8 +28,14 @@ css += `
 `;
 
 // Extract HTML
-const htmlMatch = html.match(/<!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->[\s\S]*?<\/button>\s*<\/div>/);
-let widgetHtml = htmlMatch ? htmlMatch[0] : '';
+// Extract HTML between widget start marker and the next section (enquiry modal)
+const WIDGET_START = '<!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->';
+const WIDGET_END   = '\n<!-- ─── ENQUIRY FORM MODAL';
+const startIdx = html.indexOf(WIDGET_START);
+const endIdx   = html.indexOf(WIDGET_END);
+let widgetHtml = (startIdx !== -1 && endIdx !== -1)
+  ? html.substring(startIdx, endIdx).trimEnd()
+  : '';
 
 const jsContent = `(function () {
   'use strict';
