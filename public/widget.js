@@ -551,7 +551,7 @@
       }
     }
 
-    /* ── Mobile (≤ 640px) – Strictly Floating Partition ── */
+    /* ── Mobile (≤ 640px) – Floating chat widget, NOT full screen ── */
     @media (max-width: 640px) {
       .cx-widget-container {
         bottom: 16px;
@@ -561,32 +561,28 @@
         display: none;
       }
       .cx-launcher {
-        width: 56px;
-        height: 56px;
+        width: 54px;
+        height: 54px;
       }
-      
+
       /* 
-       * Absolute positioning ensures it aligns relative to the fixed parent container 
-       * (the launcher bubble) rather than stretching across the viewport screen.
+       * position: fixed anchors the panel directly to the VIEWPORT.
+       * bottom + height together guarantee the panel never covers the full screen.
+       * top: auto prevents it from stretching upward.
        */
       .cx-chat-panel {
-        position: absolute !important;
-        bottom: 72px !important;  /* Space strictly above the bubble */
-        right: 0 !important;      /* Align to right edge of bubble */
-        left: auto !important;    /* Prevent horizontal stretching */
-        top: auto !important;     /* Prevent vertical stretching */
-        
-        width: calc(100vw - 32px) !important;
-        max-width: 360px !important;
-        
-        height: 480px !important; 
-        max-height: 65vh !important; /* Forces it to remain a small floating card */
-        min-height: 350px !important;
-        
+        position: fixed !important;
+        bottom: 86px !important;
+        right: 12px !important;
+        left: 12px !important;
+        top: auto !important;
+        width: auto !important;
+        height: 440px !important;
+        max-height: 55vh !important;
+        min-height: 260px !important;
         border-radius: 20px !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
-        z-index: 100000;
-        transform-origin: bottom right; 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+        z-index: 100000 !important;
       }
       
       .cx-header {
