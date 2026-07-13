@@ -7,12 +7,712 @@
 
   // Inject styles
   const style = document.createElement('style');
-  style.textContent = ":root {\n  --cx-red: #E31E24;\n  --cx-red-hover: #c41318;\n  --cx-dark: #1C1C1C;\n  --cx-dark-light: #2e2e2e;\n  --cx-gray-bg: #f7f7f7;\n  --cx-border: #e8e8e8;\n  --cx-text-primary: #1C1C1C;\n  --cx-text-secondary: #666666;\n}\n/* ─── CHAT WIDGET STYLES ─── */\r\n    .cx-widget-container {\r\n      position: fixed;\r\n      bottom: 24px;\r\n      right: 24px;\r\n      z-index: 9999;\r\n      display: flex;\r\n      flex-direction: column;\r\n      align-items: flex-end;\r\n      font-family: 'Inter', sans-serif;\r\n    }\r\n\r\n    /* Bubble Launcher */\r\n    .cx-launcher {\r\n      width: 60px;\r\n      height: 60px;\r\n      border-radius: 50%;\r\n      background: linear-gradient(135deg, var(--cx-red) 0%, #b81419 100%);\r\n      box-shadow: 0 4px 20px rgba(227, 30, 36, 0.4);\r\n      cursor: pointer;\r\n      display: flex;\r\n      align-items: center;\r\n      justify-content: center;\r\n      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;\r\n      border: none;\r\n      outline: none;\r\n      position: relative;\r\n    }\r\n    .cx-launcher:hover {\r\n      transform: scale(1.08);\r\n      box-shadow: 0 6px 24px rgba(227, 30, 36, 0.5);\r\n    }\r\n    .cx-launcher:active {\r\n      transform: scale(0.95);\r\n    }\r\n    .cx-launcher svg {\r\n      width: 26px;\r\n      height: 26px;\r\n      fill: white;\r\n      transition: transform 0.3s ease, opacity 0.2s;\r\n    }\r\n    .cx-launcher .cx-icon-close {\r\n      position: absolute;\r\n      opacity: 0;\r\n      transform: rotate(-45deg) scale(0.8);\r\n    }\r\n    .cx-launcher.open .cx-icon-chat {\r\n      opacity: 0;\r\n      transform: rotate(45deg) scale(0.8);\r\n    }\r\n    .cx-launcher.open .cx-icon-close {\r\n      opacity: 1;\r\n      transform: rotate(0deg) scale(1);\r\n    }\r\n\r\n    /* Notification Badge */\r\n    .cx-badge {\r\n      position: absolute;\r\n      top: -2px;\r\n      right: -2px;\r\n      width: 14px;\r\n      height: 14px;\r\n      background: #27c93f;\r\n      border: 2px solid white;\r\n      border-radius: 50%;\r\n      animation: cx-pulse 2s infinite;\r\n    }\r\n\r\n    /* Launcher Tooltip */\r\n    .cx-launcher-tooltip {\r\n      position: absolute;\r\n      right: 76px;\r\n      bottom: 10px;\r\n      background: white;\r\n      border: 1px solid var(--cx-border);\r\n      border-radius: 12px;\r\n      padding: 10px 16px;\r\n      box-shadow: 0 4px 15px rgba(0,0,0,0.06);\r\n      font-size: 13px;\r\n      font-weight: 500;\r\n      color: var(--cx-text-primary);\r\n      white-space: nowrap;\r\n      pointer-events: none;\r\n      opacity: 1;\r\n      transform: translateX(10px);\r\n      transition: opacity 0.3s, transform 0.3s;\r\n      display: flex;\r\n      align-items: center;\r\n      gap: 8px;\r\n    }\r\n    .cx-launcher-tooltip.hidden {\r\n      opacity: 0;\r\n      transform: translateX(20px);\r\n    }\r\n    .cx-tooltip-dot {\r\n      width: 8px;\r\n      height: 8px;\r\n      background-color: var(--cx-red);\r\n      border-radius: 50%;\r\n    }\r\n\r\n    /* Chat Panel */\r\n    .cx-chat-panel {\r\n      position: absolute;\r\n      bottom: 76px;\r\n      right: 0;\r\n      width: 385px;\r\n      height: 600px;\r\n      max-height: calc(100vh - 120px);\r\n      background: white;\r\n      border-radius: 20px;\r\n      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);\r\n      border: 1px solid rgba(0,0,0,0.05);\r\n      display: flex;\r\n      flex-direction: column;\r\n      overflow: hidden;\r\n      opacity: 0;\r\n      transform: translateY(20px) scale(0.95);\r\n      pointer-events: none;\r\n      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\r\n    }\r\n    .cx-chat-panel.open {\r\n      opacity: 1;\r\n      transform: translateY(0) scale(1);\r\n      pointer-events: all;\r\n    }\r\n\r\n    /* Panel Header */\r\n    .cx-header {\r\n      background: var(--cx-dark);\r\n      padding: 16px 20px;\r\n      display: flex;\r\n      align-items: center;\r\n      justify-content: space-between;\r\n      border-bottom: 1px solid rgba(255,255,255,0.08);\r\n    }\r\n    .cx-header-info {\r\n      display: flex;\r\n      align-items: center;\r\n      gap: 12px;\r\n    }\r\n    .cx-header-avatar {\r\n      width: 38px;\r\n      height: 38px;\r\n      background: var(--cx-red);\r\n      border-radius: 10px;\r\n      display: flex;\r\n      align-items: center;\r\n      justify-content: center;\r\n      font-weight: 800;\r\n      font-size: 13px;\r\n      color: white;\r\n    }\r\n    .cx-header-meta {\r\n      display: flex;\r\n      flex-direction: column;\r\n    }\r\n    .cx-header-title {\r\n      color: white;\r\n      font-weight: 700;\r\n      font-size: 14.5px;\r\n      line-height: 1.2;\r\n    }\r\n    .cx-header-status {\r\n      display: flex;\r\n      align-items: center;\r\n      gap: 6px;\r\n      font-size: 11.5px;\r\n      color: rgba(255,255,255,0.5);\r\n      margin-top: 2px;\r\n    }\r\n    .cx-status-dot {\r\n      width: 7px;\r\n      height: 7px;\r\n      background: #27c93f;\r\n      border-radius: 50%;\r\n    }\r\n    .cx-header-actions button {\r\n      background: transparent;\r\n      border: none;\r\n      cursor: pointer;\r\n      color: rgba(255,255,255,0.6);\r\n      padding: 6px;\r\n      border-radius: 50%;\r\n      display: flex;\r\n      align-items: center;\r\n      justify-content: center;\r\n      transition: background 0.2s, color 0.2s;\r\n    }\r\n    .cx-header-actions button:hover {\r\n      background: rgba(255,255,255,0.1);\r\n      color: white;\r\n    }\r\n\r\n    /* Message Area */\r\n    .cx-body {\r\n      flex: 1;\r\n      padding: 20px;\r\n      overflow-y: auto;\r\n      display: flex;\r\n      flex-direction: column;\r\n      gap: 16px;\r\n      background: #FAFAFA;\r\n      scroll-behavior: smooth;\r\n    }\r\n\r\n    /* Custom Scrollbar for Message Area */\r\n    .cx-body::-webkit-scrollbar {\r\n      width: 6px;\r\n    }\r\n    .cx-body::-webkit-scrollbar-track {\r\n      background: transparent;\r\n    }\r\n    .cx-body::-webkit-scrollbar-thumb {\r\n      background-color: rgba(0,0,0,0.1);\r\n      border-radius: 10px;\r\n    }\r\n\r\n    /* Chat Bubbles */\r\n    .cx-msg-wrapper {\r\n      display: flex;\r\n      flex-direction: column;\r\n      max-width: 82%;\r\n      animation: cx-fade-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;\r\n    }\r\n    .cx-msg-wrapper.bot {\r\n      align-self: flex-start;\r\n    }\r\n    .cx-msg-wrapper.user {\r\n      align-self: flex-end;\r\n    }\r\n\r\n    .cx-msg-bubble {\r\n      padding: 12px 16px;\r\n      border-radius: 16px;\r\n      font-size: 13.5px;\r\n      line-height: 1.5;\r\n      word-wrap: break-word;\r\n    }\r\n    .bot .cx-msg-bubble {\r\n      background: white;\r\n      color: var(--cx-text-primary);\r\n      border-bottom-left-radius: 4px;\r\n      box-shadow: 0 2px 8px rgba(0,0,0,0.03);\r\n      border: 1px solid rgba(0,0,0,0.04);\r\n    }\r\n    .user .cx-msg-bubble {\r\n      background: var(--cx-red);\r\n      color: white;\r\n      border-bottom-right-radius: 4px;\r\n      box-shadow: 0 4px 12px rgba(227, 30, 36, 0.15);\r\n    }\r\n\r\n    .cx-msg-timestamp {\r\n      font-size: 10px;\r\n      color: #999;\r\n      margin-top: 4px;\r\n      margin-left: 4px;\r\n    }\r\n    .user .cx-msg-timestamp {\r\n      align-self: flex-end;\r\n      margin-right: 4px;\r\n    }\r\n\r\n    /* Markdown Styling in Bot Bubbles */\r\n    .cx-msg-bubble strong, .cx-msg-bubble b {\r\n      font-weight: 700;\r\n      color: #000;\r\n    }\r\n    .cx-msg-bubble p {\r\n      margin-bottom: 8px;\r\n    }\r\n    .cx-msg-bubble p:last-child {\r\n      margin-bottom: 0;\r\n    }\r\n    .cx-msg-bubble ul, .cx-msg-bubble ol {\r\n      padding-left: 18px;\r\n      margin: 8px 0;\r\n    }\r\n    .cx-msg-bubble li {\r\n      margin-bottom: 4px;\r\n    }\r\n\r\n    /* Dynamic Typing Indicator */\r\n    .cx-typing-bubble {\r\n      display: flex;\r\n      align-items: center;\r\n      gap: 5px;\r\n      padding: 12px 18px;\r\n      background: white;\r\n      border-radius: 16px;\r\n      border-bottom-left-radius: 4px;\r\n      box-shadow: 0 2px 8px rgba(0,0,0,0.03);\r\n      border: 1px solid rgba(0,0,0,0.04);\r\n      width: fit-content;\r\n      align-self: flex-start;\r\n      margin-bottom: 12px;\r\n    }\r\n    .cx-typing-dot {\r\n      width: 7px;\r\n      height: 7px;\r\n      background: #c0c0c0;\r\n      border-radius: 50%;\r\n      animation: cx-bounce 1.4s infinite ease-in-out both;\r\n    }\r\n    .cx-typing-dot:nth-child(1) { animation-delay: -0.32s; }\r\n    .cx-typing-dot:nth-child(2) { animation-delay: -0.16s; }\r\n\r\n    /* Action CTA Card */\r\n    .cx-cta-card {\r\n      background: linear-gradient(135deg, #FFF8F8 0%, #FFF1F1 100%);\r\n      border: 1px solid rgba(227, 30, 36, 0.15);\r\n      border-radius: 14px;\r\n      padding: 16px;\r\n      margin-top: 8px;\r\n      display: flex;\r\n      flex-direction: column;\r\n      gap: 12px;\r\n      box-shadow: 0 4px 15px rgba(227, 30, 36, 0.04);\r\n      align-self: flex-start;\r\n      max-width: 90%;\r\n      animation: cx-fade-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;\r\n    }\r\n    .cx-cta-title {\r\n      font-size: 13.5px;\r\n      font-weight: 700;\r\n      color: var(--cx-dark);\r\n      display: flex;\r\n      align-items: center;\r\n      gap: 6px;\r\n    }\r\n    .cx-cta-desc {\r\n      font-size: 12px;\r\n      color: #555;\r\n      line-height: 1.5;\r\n    }\r\n    .cx-cta-btn {\r\n      background: var(--cx-red);\r\n      color: white;\r\n      border: none;\r\n      border-radius: 8px;\r\n      padding: 8px 14px;\r\n      font-size: 12.5px;\r\n      font-weight: 600;\r\n      cursor: pointer;\r\n      transition: background 0.2s, transform 0.1s;\r\n      text-align: center;\r\n      display: inline-block;\r\n      text-decoration: none;\r\n    }\r\n    .cx-cta-btn:hover {\r\n      background: var(--cx-red-hover);\r\n    }\r\n    .cx-cta-btn:active {\r\n      transform: scale(0.98);\r\n    }\r\n\r\n    /* Quick Action Chips */\r\n    .cx-chips-container {\r\n      padding: 10px 14px;\r\n      background: white;\r\n      border-top: 1px solid var(--cx-border);\r\n      display: flex;\r\n      gap: 8px;\r\n      overflow-x: auto;\r\n      white-space: nowrap;\r\n      scroll-behavior: smooth;\r\n    }\r\n    .cx-chips-container::-webkit-scrollbar {\r\n      display: none; /* Hide default scrollbar for sleek iOS-style swipe */\r\n    }\r\n    .cx-chip {\r\n      background: #f1f1f1;\r\n      border: 1px solid #e2e2e2;\r\n      color: #444;\r\n      font-size: 12px;\r\n      font-weight: 500;\r\n      padding: 8px 14px;\r\n      border-radius: 18px;\r\n      cursor: pointer;\r\n      transition: background 0.2s, border-color 0.2s, transform 0.1s;\r\n      display: inline-block;\r\n      flex-shrink: 0;\r\n    }\r\n    .cx-chip:hover {\r\n      background: #e8e8e8;\r\n      border-color: #d0d0d0;\r\n      transform: translateY(-1px);\r\n    }\r\n    .cx-chip:active {\r\n      transform: translateY(0);\r\n    }\r\n\r\n    /* Footer Input Area */\r\n    .cx-input-area {\r\n      padding: 12px 16px 16px;\r\n      background: white;\r\n      border-top: 1px solid var(--cx-border);\r\n      display: flex;\r\n      flex-direction: column;\r\n      gap: 8px;\r\n    }\r\n    .cx-input-box-wrapper {\r\n      display: flex;\r\n      align-items: flex-end;\r\n      gap: 10px;\r\n      background: #FAFAFA;\r\n      border: 1.5px solid var(--cx-border);\r\n      border-radius: 14px;\r\n      padding: 6px 12px 6px 14px;\r\n      transition: border-color 0.2s, box-shadow 0.2s;\r\n    }\r\n    .cx-input-box-wrapper:focus-within {\r\n      border-color: var(--cx-red);\r\n      box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.08);\r\n      background: white;\r\n    }\r\n\r\n    /* Auto-growing Textarea */\r\n    .cx-textarea {\r\n      flex: 1;\r\n      border: none;\r\n      background: transparent;\r\n      outline: none;\r\n      resize: none;\r\n      font-family: inherit;\r\n      font-size: 13.5px;\r\n      line-height: 1.5;\r\n      color: var(--cx-text-primary);\r\n      max-height: 110px;\r\n      min-height: 24px;\r\n      height: 24px;\r\n      padding: 3px 0;\r\n    }\r\n    .cx-textarea::placeholder {\r\n      color: #aaa;\r\n    }\r\n\r\n    /* Send Button */\r\n    .cx-send-btn {\r\n      background: transparent;\r\n      border: none;\r\n      cursor: pointer;\r\n      display: flex;\r\n      align-items: center;\r\n      justify-content: center;\r\n      width: 34px;\r\n      height: 34px;\r\n      border-radius: 50%;\r\n      transition: background 0.2s, transform 0.1s;\r\n      color: #999;\r\n      flex-shrink: 0;\r\n    }\r\n    .cx-send-btn.active {\r\n      color: var(--cx-red);\r\n      background: rgba(227, 30, 36, 0.06);\r\n    }\r\n    .cx-send-btn.active:hover {\r\n      background: rgba(227, 30, 36, 0.1);\r\n      transform: scale(1.05);\r\n    }\r\n    .cx-send-btn svg {\r\n      width: 18px;\r\n      height: 18px;\r\n      fill: currentColor;\r\n    }\r\n\r\n    .cx-footer-note {\r\n      font-size: 10px;\r\n      color: rgba(0,0,0,0.5);\r\n      text-align: center;\r\n      line-height: 1.2;\r\n    }\r\n\r\n    /* ─── ENQUIRY FORM MODAL ─── */\r\n    .cx-modal {\r\n      position: fixed;\r\n      top: 0; left: 0; right: 0; bottom: 0;\r\n      background: rgba(0,0,0,0.5);\r\n      backdrop-filter: blur(4px);\r\n      z-index: 100000;\r\n      display: flex;\r\n      align-items: center;\r\n      justify-content: center;\r\n      opacity: 0;\r\n      pointer-events: none;\r\n      transition: opacity 0.3s ease;\r\n      padding: 16px;\r\n    }\r\n    .cx-modal.open {\r\n      opacity: 1;\r\n      pointer-events: all;\r\n    }\r\n    .cx-modal-card {\r\n      background: white;\r\n      border-radius: 20px;\r\n      width: 100%;\r\n      max-width: 420px;\r\n      box-shadow: 0 20px 50px rgba(0,0,0,0.3);\r\n      overflow: hidden;\r\n      transform: scale(0.9) translateY(20px);\r\n      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\r\n    }\r\n    .cx-modal.open .cx-modal-card {\r\n      transform: scale(1) translateY(0);\r\n    }\r\n    .cx-modal-header {\r\n      background: var(--cx-dark);\r\n      padding: 20px 24px;\r\n      color: white;\r\n      position: relative;\r\n    }\r\n    .cx-modal-header h3 {\r\n      font-size: 16px;\r\n      font-weight: 700;\r\n      margin-bottom: 4px;\r\n    }\r\n    .cx-modal-header p {\r\n      color: rgba(255,255,255,0.6);\r\n      font-size: 12px;\r\n    }\r\n    .cx-modal-close {\r\n      position: absolute;\r\n      top: 20px;\r\n      right: 20px;\r\n      background: transparent;\r\n      border: none;\r\n      color: rgba(255,255,255,0.6);\r\n      cursor: pointer;\r\n      transition: color 0.2s;\r\n    }\r\n    .cx-modal-close:hover {\r\n      color: white;\r\n    }\r\n    .cx-modal-body {\r\n      padding: 24px;\r\n      display: flex;\r\n      flex-direction: column;\r\n      gap: 16px;\r\n    }\r\n    .cx-form-group {\r\n      display: flex;\r\n      flex-direction: column;\r\n      gap: 6px;\r\n    }\r\n    .cx-form-group label {\r\n      font-size: 12.5px;\r\n      font-weight: 600;\r\n      color: var(--cx-text-primary);\r\n    }\r\n    .cx-form-group input, .cx-form-group select {\r\n      padding: 10px 14px;\r\n      border: 1.5px solid var(--cx-border);\r\n      border-radius: 10px;\r\n      font-size: 13.5px;\r\n      font-family: inherit;\r\n      outline: none;\r\n      transition: border-color 0.2s;\r\n    }\r\n    .cx-form-group input:focus, .cx-form-group select:focus {\r\n      border-color: var(--cx-red);\r\n    }\r\n    .cx-form-submit {\r\n      background: var(--cx-red);\r\n      color: white;\r\n      border: none;\r\n      border-radius: 10px;\r\n      padding: 12px;\r\n      font-size: 14px;\r\n      font-weight: 600;\r\n      cursor: pointer;\r\n      transition: background 0.2s;\r\n      margin-top: 8px;\r\n    }\r\n    .cx-form-submit:hover {\r\n      background: var(--cx-red-hover);\r\n    }\r\n\r\n    /* Mock Error Banner inside panel */\r\n    .cx-error-banner {\r\n      background: #FEE2E2;\r\n      border: 1px solid #FCA5A5;\r\n      border-radius: 10px;\r\n      padding: 10px 14px;\r\n      font-size: 12px;\r\n      color: #991B1B;\r\n      margin-bottom: 8px;\r\n      align-self: center;\r\n      text-align: center;\r\n      max-width: 90%;\r\n      animation: cx-fade-slide 0.3s ease;\r\n    }\r\n\r\n    /* ── Animations ── */\r\n    @keyframes cx-bounce {\r\n      0%, 80%, 100% { transform: scale(0); }\r\n      40% { transform: scale(1.0); }\r\n    }\r\n    @keyframes cx-pulse {\r\n      0% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.7); }\r\n      70% { box-shadow: 0 0 0 6px rgba(39, 201, 63, 0); }\r\n      100% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }\r\n    }\r\n    @keyframes cx-fade-slide {\r\n      from {\r\n        opacity: 0;\r\n        transform: translateY(8px);\r\n      }\r\n      to {\r\n        opacity: 1;\r\n        transform: translateY(0);\r\n      }\r\n    }\n\n    /* ── Tablet (641px – 1024px) ── */\n    @media (min-width: 641px) and (max-width: 1024px) {\n      .cx-widget-container {\n        bottom: 20px;\n        right: 20px;\n      }\n      .cx-chat-panel {\n        width: 340px;\n        height: 520px;\n        max-height: calc(100vh - 110px);\n      }\n    }\n\n    /* ── Mobile (≤ 640px) – Bottom-Sheet Style ── */\n    @media (max-width: 640px) {\n      .cx-widget-container {\n        bottom: 14px;\n        right: 14px;\n      }\n      .cx-launcher-tooltip {\n        display: none;\n      }\n      .cx-launcher {\n        width: 52px;\n        height: 52px;\n      }\n      /* Bottom-sheet: anchored to the bottom, does NOT cover full screen */\n      .cx-chat-panel {\n        position: fixed !important;\n        bottom: 82px !important;\n        right: 16px !important;\n        left: 16px !important;\n        top: auto !important;\n        width: auto !important;\n        height: 420px !important;\n        max-height: 420px !important;\n        min-height: 260px !important;\n        border-radius: 18px !important;\n        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22) !important;\n        z-index: 100000;\n      }\n      .cx-header {\n        padding: 13px 16px;\n      }\n      .cx-body {\n        padding: 14px 14px;\n      }\n      .cx-msg-bubble {\n        font-size: 13px;\n      }\n      .cx-chips-container {\n        padding: 8px 12px;\n        gap: 6px;\n      }\n      .cx-chip {\n        font-size: 11.5px;\n        padding: 7px 12px;\n      }\n      .cx-input-area {\n        padding: 10px 12px 14px;\n      }\n    }\n/* Rate-limit countdown banner (amber) */\n.cx-rate-banner {\n  background: #fffbeb !important;\n  border-color: #fcd34d !important;\n  color: #92400e !important;\n}\n.cx-rate-banner strong { color: #b45309; font-weight: 700; }\n";
+  style.textContent = `
+    :root {
+      --cx-red: #E31E24;
+      --cx-red-hover: #c41318;
+      --cx-dark: #1C1C1C;
+      --cx-dark-light: #2e2e2e;
+      --cx-gray-bg: #f7f7f7;
+      --cx-border: #e8e8e8;
+      --cx-text-primary: #1C1C1C;
+      --cx-text-secondary: #666666;
+    }
+    /* ─── CHAT WIDGET STYLES ─── */
+    .cx-widget-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Bubble Launcher */
+    .cx-launcher {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cx-red) 0%, #b81419 100%);
+      box-shadow: 0 4px 20px rgba(227, 30, 36, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+      border: none;
+      outline: none;
+      position: relative;
+    }
+    .cx-launcher:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 24px rgba(227, 30, 36, 0.5);
+    }
+    .cx-launcher:active {
+      transform: scale(0.95);
+    }
+    
+    .cx-launcher svg {
+      width: 26px;
+      height: 26px;
+      fill: white;
+      transition: transform 0.3s ease, opacity 0.2s;
+    }
+    .cx-launcher .cx-icon-close {
+      position: absolute;
+      opacity: 0;
+      transform: rotate(-45deg) scale(0.8);
+    }
+    .cx-launcher.open .cx-icon-chat {
+      opacity: 0;
+      transform: rotate(45deg) scale(0.8);
+    }
+    .cx-launcher.open .cx-icon-close {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    /* Notification Badge */
+    .cx-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      background: #27c93f;
+      border: 2px solid white;
+      border-radius: 50%;
+      animation: cx-pulse 2s infinite;
+    }
+
+    /* Launcher Tooltip */
+    .cx-launcher-tooltip {
+      position: absolute;
+      right: 76px;
+      bottom: 10px;
+      background: white;
+      border: 1px solid var(--cx-border);
+      border-radius: 12px;
+      padding: 10px 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--cx-text-primary);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 1;
+      transform: translateX(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cx-launcher-tooltip.hidden {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    .cx-tooltip-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--cx-red);
+      border-radius: 50%;
+    }
+
+    /* Chat Panel */
+    .cx-chat-panel {
+      position: absolute;
+      bottom: 76px;
+      right: 0;
+      width: 385px;
+      height: 600px;
+      max-height: calc(100vh - 120px);
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cx-chat-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    /* Panel Header */
+    .cx-header {
+      background: var(--cx-dark);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .cx-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .cx-header-avatar {
+      width: 38px;
+      height: 38px;
+      background: var(--cx-red);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: white;
+    }
+    .cx-header-meta {
+      display: flex;
+      flex-direction: column;
+    }
+    .cx-header-title {
+      color: white;
+      font-weight: 700;
+      font-size: 14.5px;
+      line-height: 1.2;
+    }
+    .cx-header-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    .cx-status-dot {
+      width: 7px;
+      height: 7px;
+      background: #27c93f;
+      border-radius: 50%;
+    }
+    
+    .cx-header-actions button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.6);
+      padding: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cx-header-actions button:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    /* Message Area */
+    .cx-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #FAFAFA;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar for Message Area */
+    .cx-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .cx-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .cx-body::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    /* Chat Bubbles */
+    .cx-msg-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 82%;
+      animation: cx-fade-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .cx-msg-wrapper.bot {
+      align-self: flex-start;
+    }
+    .cx-msg-wrapper.user {
+      align-self: flex-end;
+    }
+
+    .cx-msg-bubble {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+    .bot .cx-msg-bubble {
+      background: white;
+      color: var(--cx-text-primary);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .user .cx-msg-bubble {
+      background: var(--cx-red);
+      color: white;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(227, 30, 36, 0.15);
+    }
+
+    .cx-msg-timestamp {
+      font-size: 10px;
+      color: #999;
+      margin-top: 4px;
+      margin-left: 4px;
+    }
+    .user .cx-msg-timestamp {
+      align-self: flex-end;
+      margin-right: 4px;
+    }
+
+    /* Markdown Styling in Bot Bubbles */
+    .cx-msg-bubble strong, .cx-msg-bubble b {
+      font-weight: 700;
+      color: #000;
+    }
+    .cx-msg-bubble p {
+      margin-bottom: 8px;
+    }
+    .cx-msg-bubble p:last-child {
+      margin-bottom: 0;
+    }
+    .cx-msg-bubble ul, .cx-msg-bubble ol {
+      padding-left: 18px;
+      margin: 8px 0;
+    }
+    .cx-msg-bubble li {
+      margin-bottom: 4px;
+    }
+
+    /* Dynamic Typing Indicator */
+    .cx-typing-bubble {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 12px 18px;
+      background: white;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.04);
+      width: fit-content;
+      align-self: flex-start;
+      margin-bottom: 12px;
+    }
+    .cx-typing-dot {
+      width: 7px;
+      height: 7px;
+      background: #c0c0c0;
+      border-radius: 50%;
+      animation: cx-bounce 1.4s infinite ease-in-out both;
+    }
+    .cx-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .cx-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    /* Action CTA Card */
+    .cx-cta-card {
+      background: linear-gradient(135deg, #FFF8F8 0%, #FFF1F1 100%);
+      border: 1px solid rgba(227, 30, 36, 0.15);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 15px rgba(227, 30, 36, 0.04);
+      align-self: flex-start;
+      max-width: 90%;
+      animation: cx-fade-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .cx-cta-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--cx-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cx-cta-desc {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+    }
+    .cx-cta-btn {
+      background: var(--cx-red);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      text-align: center;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .cx-cta-btn:hover {
+      background: var(--cx-red-hover);
+    }
+    .cx-cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Quick Action Chips */
+    .cx-chips-container {
+      padding: 10px 14px;
+      background: white;
+      border-top: 1px solid var(--cx-border);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scroll-behavior: smooth;
+    }
+    .cx-chips-container::-webkit-scrollbar {
+      display: none; /* Hide default scrollbar for sleek iOS-style swipe */
+    }
+    .cx-chip {
+      background: #f1f1f1;
+      border: 1px solid #e2e2e2;
+      color: #444;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .cx-chip:hover {
+      background: #e8e8e8;
+      border-color: #d0d0d0;
+      transform: translateY(-1px);
+    }
+    .cx-chip:active {
+      transform: translateY(0);
+    }
+
+    /* Footer Input Area */
+    .cx-input-area {
+      padding: 12px 16px 16px;
+      background: white;
+      border-top: 1px solid var(--cx-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cx-input-box-wrapper {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: #FAFAFA;
+      border: 1.5px solid var(--cx-border);
+      border-radius: 14px;
+      padding: 6px 12px 6px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .cx-input-box-wrapper:focus-within {
+      border-color: var(--cx-red);
+      box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.08);
+      background: white;
+    }
+
+    /* Auto-growing Textarea */
+    .cx-textarea {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--cx-text-primary);
+      max-height: 110px;
+      min-height: 24px;
+      height: 24px;
+      padding: 3px 0;
+    }
+    .cx-textarea::placeholder {
+      color: #aaa;
+    }
+
+    /* Send Button */
+    .cx-send-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      transition: background 0.2s, transform 0.1s;
+      color: #999;
+      flex-shrink: 0;
+    }
+    .cx-send-btn.active {
+      color: var(--cx-red);
+      background: rgba(227, 30, 36, 0.06);
+    }
+    .cx-send-btn.active:hover {
+      background: rgba(227, 30, 36, 0.1);
+      transform: scale(1.05);
+    }
+    .cx-send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .cx-footer-note {
+      font-size: 10px;
+      color: rgba(0,0,0,0.5);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* Mock Error Banner inside panel */
+    .cx-error-banner {
+      background: #FEE2E2;
+      border: 1px solid #FCA5A5;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #991B1B;
+      margin-bottom: 8px;
+      align-self: center;
+      text-align: center;
+      max-width: 90%;
+      animation: cx-fade-slide 0.3s ease;
+    }
+
+    /* Rate-limit countdown banner (amber) */
+    .cx-rate-banner {
+      background: #fffbeb !important;
+      border-color: #fcd34d !important;
+      color: #92400e !important;
+    }
+    .cx-rate-banner strong { color: #b45309; font-weight: 700; }
+
+    /* ── Animations ── */
+    @keyframes cx-bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+    @keyframes cx-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(39, 201, 63, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }
+    }
+    @keyframes cx-fade-slide {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Tablet (641px – 1024px) ── */
+    @media (min-width: 641px) and (max-width: 1024px) {
+      .cx-widget-container {
+        bottom: 20px;
+        right: 20px;
+      }
+      .cx-chat-panel {
+        width: 340px;
+        height: 520px;
+        max-height: calc(100vh - 110px);
+      }
+    }
+
+    /* ── Mobile (≤ 640px) – Strictly Floating Partition ── */
+    @media (max-width: 640px) {
+      .cx-widget-container {
+        bottom: 16px;
+        right: 16px;
+      }
+      .cx-launcher-tooltip {
+        display: none;
+      }
+      .cx-launcher {
+        width: 56px;
+        height: 56px;
+      }
+      
+      /* 
+       * Absolute positioning ensures it aligns relative to the fixed parent container 
+       * (the launcher bubble) rather than stretching across the viewport screen.
+       */
+      .cx-chat-panel {
+        position: absolute !important;
+        bottom: 72px !important;  /* Space strictly above the bubble */
+        right: 0 !important;      /* Align to right edge of bubble */
+        left: auto !important;    /* Prevent horizontal stretching */
+        top: auto !important;     /* Prevent vertical stretching */
+        
+        width: calc(100vw - 32px) !important;
+        max-width: 360px !important;
+        
+        height: 480px !important; 
+        max-height: 65vh !important; /* Forces it to remain a small floating card */
+        min-height: 350px !important;
+        
+        border-radius: 20px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+        z-index: 100000;
+        transform-origin: bottom right; 
+      }
+      
+      .cx-header {
+        padding: 12px 16px;
+      }
+      .cx-body {
+        padding: 16px;
+      }
+      .cx-msg-bubble {
+        font-size: 13px;
+        padding: 10px 14px;
+      }
+      .cx-chips-container {
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .cx-chip {
+        font-size: 11.5px;
+        padding: 6px 12px;
+      }
+      .cx-input-area {
+        padding: 10px 14px 14px;
+      }
+      .cx-input-box-wrapper {
+        padding: 5px 10px 5px 12px;
+      }
+      .cx-textarea {
+        font-size: 13px;
+      }
+    }
+  `;
   document.head.appendChild(style);
 
-  // Inject HTML
   const root = document.createElement('div');
-  root.innerHTML = "<!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->\r\n<div class=\"cx-widget-container\" id=\"cxWidget\">\r\n  \r\n  <!-- Tooltip hint -->\r\n  <div class=\"cx-launcher-tooltip\" id=\"cxTooltip\">\r\n    <span class=\"cx-tooltip-dot\"></span>\r\n    Ask Caddxpert AI Advisor\r\n  </div>\r\n\r\n  <!-- Chat Panel -->\r\n  <div class=\"cx-chat-panel\" id=\"cxPanel\">\r\n    <!-- Header -->\r\n    <div class=\"cx-header\">\r\n      <div class=\"cx-header-info\">\r\n        <div class=\"cx-header-avatar\">CX</div>\r\n        <div class=\"cx-header-meta\">\r\n          <span class=\"cx-header-title\">Caddxpert AI Advisor</span>\r\n          <div class=\"cx-header-status\">\r\n            <span class=\"cx-status-dot\"></span>\r\n            <span>Online • Powered by Cad Point</span>\r\n          </div>\r\n        </div>\r\n      </div>\r\n      <div class=\"cx-header-actions\">\r\n        <!-- Close / Minimize -->\r\n        <button id=\"cxCloseBtn\" title=\"Minimize Chat\">\r\n          <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\r\n            <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\r\n            <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\r\n          </svg>\r\n        </button>\r\n      </div>\r\n    </div>\r\n\r\n    <!-- Messages Container -->\r\n    <div class=\"cx-body\" id=\"cxMessages\">\r\n      <!-- Welcome message -->\r\n      <div class=\"cx-msg-wrapper bot\">\r\n        <div class=\"cx-msg-bubble\">\r\n          👋 Welcome to <strong>Caddxpert AI Innovations</strong> (Powered by CAD Point)! \r\n          <p style=\"margin-top: 8px;\">I can guide you through our professional certificate programs in CAD, MEP, Civil Architecture, Mechanical, and Software Engineering.</p>\r\n          <p style=\"margin-top: 8px;\">How can I help you shape your engineering career today?</p>\r\n        </div>\r\n        <div class=\"cx-msg-timestamp\" id=\"cxWelcomeTime\">12:00 PM</div>\r\n      </div>\r\n    </div>\r\n\r\n    <!-- Quick action chips -->\r\n    <div class=\"cx-chips-container\" id=\"cxChips\">\r\n      <div class=\"cx-chip\" data-msg=\"Which CAD/Engineering courses do you offer?\">CAD Courses 📐</div>\r\n      <div class=\"cx-chip\" data-msg=\"Are there placements after course completion?\">Placements 💼</div>\r\n      <div class=\"cx-chip\" data-msg=\"What are the course fees and durations?\">Fees &amp; Duration 💰</div>\r\n      <div class=\"cx-chip\" data-msg=\"Can I speak to a counselor for career advice?\">Free Counselling 📞</div>\r\n    </div>\r\n\r\n    <!-- Message input area -->\r\n    <div class=\"cx-input-area\">\r\n      <div class=\"cx-input-box-wrapper\">\r\n        <textarea \r\n          class=\"cx-textarea\" \r\n          id=\"cxTextarea\" \r\n          placeholder=\"Type a message...\" \r\n          rows=\"1\"\r\n          autocomplete=\"off\"\r\n        ></textarea>\r\n        <button class=\"cx-send-btn\" id=\"cxSendBtn\" title=\"Send message\">\r\n          <svg viewBox=\"0 0 24 24\">\r\n            <path d=\"M2,21L23,12L2,3V10L17,12L2,14V21Z\" />\r\n          </svg>\r\n        </button>\r\n      </div>\r\n      <div class=\"cx-footer-note\">\r\n        Our AI answers immediately. Press Enter to Send.\r\n      </div>\r\n    </div>\r\n  </div>\r\n\r\n  <!-- Launcher bubble -->\r\n  <button class=\"cx-launcher\" id=\"cxLauncher\">\r\n    <div class=\"cx-badge\"></div>\r\n    <!-- Chat Icon -->\r\n    <svg class=\"cx-icon-chat\" viewBox=\"0 0 24 24\">\r\n      <path d=\"M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.2L4,17.2V4h16V16z M7,9h10v2H7V9z M7,5h10v2H7V5z M7,13h7v2H7V13z\"/>\r\n    </svg>\r\n    <!-- Close Icon -->\r\n    <svg class=\"cx-icon-close\" viewBox=\"0 0 24 24\">\r\n      <path d=\"M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z\"/>\r\n    </svg>\r\n  </button>\r\n</div>";
+  root.innerHTML = `
+    <!-- ─── COMPLETE INTERACTIVE CHAT WIDGET ─── -->
+    <div class="cx-widget-container" id="cxWidget">
+      
+      <!-- Tooltip hint -->
+      <div class="cx-launcher-tooltip" id="cxTooltip">
+        <span class="cx-tooltip-dot"></span>
+        Ask Caddxpert AI Advisor
+      </div>
+
+      <!-- Chat Panel -->
+      <div class="cx-chat-panel" id="cxPanel">
+        <!-- Header -->
+        <div class="cx-header">
+          <div class="cx-header-info">
+            <div class="cx-header-avatar">CX</div>
+            <div class="cx-header-meta">
+              <span class="cx-header-title">Caddxpert AI Advisor</span>
+              <div class="cx-header-status">
+                <span class="cx-status-dot"></span>
+                <span>Online • Powered by Cad Point</span>
+              </div>
+            </div>
+          </div>
+          <div class="cx-header-actions">
+            <!-- Close / Minimize -->
+            <button id="cxCloseBtn" title="Minimize Chat">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="cx-body" id="cxMessages">
+          <!-- Welcome message -->
+          <div class="cx-msg-wrapper bot">
+            <div class="cx-msg-bubble">
+              👋 Welcome to <strong>Caddxpert AI Innovations</strong> (Powered by CAD Point)! 
+              <p style="margin-top: 8px;">I can guide you through our professional certificate programs in CAD, MEP, Civil Architecture, Mechanical, and Software Engineering.</p>
+              <p style="margin-top: 8px;">How can I help you shape your engineering career today?</p>
+            </div>
+            <div class="cx-msg-timestamp" id="cxWelcomeTime">12:00 PM</div>
+          </div>
+        </div>
+
+        <!-- Quick action chips -->
+        <div class="cx-chips-container" id="cxChips">
+          <div class="cx-chip" data-msg="Which CAD/Engineering courses do you offer?">CAD Courses 📐</div>
+          <div class="cx-chip" data-msg="Are there placements after course completion?">Placements 💼</div>
+          <div class="cx-chip" data-msg="What are the course fees and durations?">Fees &amp; Duration 💰</div>
+          <div class="cx-chip" data-msg="Can I speak to a counselor for career advice?">Free Counselling 📞</div>
+        </div>
+
+        <!-- Message input area -->
+        <div class="cx-input-area">
+          <div class="cx-input-box-wrapper">
+            <textarea 
+              class="cx-textarea" 
+              id="cxTextarea" 
+              placeholder="Type a message..." 
+              rows="1"
+              autocomplete="off"
+            ></textarea>
+            <button class="cx-send-btn" id="cxSendBtn" title="Send message">
+              <svg viewBox="0 0 24 24">
+                <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+              </svg>
+            </button>
+          </div>
+          <div class="cx-footer-note">
+            Our AI answers immediately. Press Enter to Send.
+          </div>
+        </div>
+      </div>
+
+      <!-- Launcher bubble -->
+      <button class="cx-launcher" id="cxLauncher">
+        <div class="cx-badge"></div>
+        <!-- Chat Icon -->
+        <svg class="cx-icon-chat" viewBox="0 0 24 24">
+          <path d="M20,2H4C2.9,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.2L4,17.2V4h16V16z M7,9h10v2H7V9z M7,5h10v2H7V5z M7,13h7v2H7V13z"/>
+        </svg>
+        <!-- Close Icon -->
+        <svg class="cx-icon-close" viewBox="0 0 24 24">
+          <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+        </svg>
+      </button>
+    </div>
+  `;
   document.body.appendChild(root);
 
   // ── Widget DOM Elements ──
