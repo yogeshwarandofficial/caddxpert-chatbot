@@ -12,7 +12,18 @@ const API_KEY = process.env.GEMINI_API_KEY;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('public', {
+  etag: true,
+  lastModified: true,
+  setHeaders(res, filePath) {
+    // Never cache widget.js or HTML files — always serve fresh on every request
+    if (filePath.endsWith('.js') || filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 // ── Load vectors into memory on startup ────────────────────────────────────
 let vectorDB = [];
