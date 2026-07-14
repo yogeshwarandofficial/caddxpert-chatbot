@@ -432,8 +432,8 @@
       const SIDE_MARGIN     = 12;
 
       const bottomOffset = BOTTOM_MARGIN + LAUNCHER_HEIGHT + GAP; // 80px
-      const maxH         = Math.floor(vh * 0.54);                 // 54% of viewport
-      const panelH       = Math.min(440, maxH);                   // at most 440px
+      const maxH         = Math.floor(vh * 0.65);                 // 65% of viewport
+      const panelH       = Math.min(520, maxH);                   // at most 520px
 
       p.position   = 'fixed';
       p.bottom     = bottomOffset + 'px';
@@ -453,7 +453,7 @@
       const RIGHT_MARGIN    = 20;
 
       const bottomOffset = BOTTOM_MARGIN + LAUNCHER_HEIGHT + GAP;
-      const panelH       = Math.min(520, vh - bottomOffset - 20);
+      const panelH       = Math.min(580, vh - bottomOffset - 20);
 
       p.position   = 'fixed';
       p.bottom     = bottomOffset + 'px';
@@ -473,7 +473,7 @@
       const RIGHT_MARGIN    = 24;
 
       const bottomOffset = BOTTOM_MARGIN + LAUNCHER_HEIGHT + GAP;
-      const panelH       = Math.min(600, vh - bottomOffset - 20);
+      const panelH       = Math.min(660, vh - bottomOffset - 20);
 
       p.position   = 'fixed';
       p.bottom     = bottomOffset + 'px';
