@@ -368,7 +368,7 @@
             <span class="cx-header-title">Caddxpert AI Advisor</span>
             <div class="cx-header-status">
               <span class="cx-status-dot"></span>
-              <span>Online • Powered by Cad Point</span>
+              <span>Online • Powered by  Point</span>
             </div>
           </div>
         </div>
