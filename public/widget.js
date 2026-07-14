@@ -638,7 +638,7 @@
       card.innerHTML = `
         <div class="cx-cta-title"><span>🎓</span> Free Counselling &amp; Admission Guidance</div>
         <div class="cx-cta-desc">Get an instant callback from our expert senior career advisors and secure special discounts on standard course fees.</div>
-        <a class="cx-cta-btn" href="${ENQUIRY}" target="_blank" rel="noopener" style="text-decoration:none;">Book Counseling Now</a>
+        <a class="cx-cta-btn" href="${ENQUIRY}" style="text-decoration:none;">Book Counseling Now</a>
       `;
       messagesContainer.appendChild(card);
       scrollChatToBottom();
