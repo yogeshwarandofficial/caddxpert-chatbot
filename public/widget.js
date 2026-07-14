@@ -128,9 +128,12 @@
     }
     .cx-header-info   { display: flex; align-items: center; gap: 12px; }
     .cx-header-avatar {
-      width: 38px; height: 38px; background: var(--cx-red);
+      width: 42px; height: 42px; background: white;
       border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-weight: 800; font-size: 13px; color: white;
+      justify-content: center; overflow: hidden; padding: 2px; flex-shrink: 0;
+    }
+    .cx-header-avatar img {
+      width: 100%; height: 100%; object-fit: contain; border-radius: 8px;
     }
     .cx-header-meta   { display: flex; flex-direction: column; }
     .cx-header-title  { color: white; font-weight: 700; font-size: 14.5px; line-height: 1.2; }
@@ -368,7 +371,7 @@
     <div class="cx-chat-panel" id="cxPanel">
       <div class="cx-header">
         <div class="cx-header-info">
-          <div class="cx-header-avatar">CX</div>
+          <div class="cx-header-avatar"><img src="/cx-logo.png" alt="CX Logo" onerror="this.parentNode.innerHTML='CX'"/></div>
           <div class="cx-header-meta">
             <span class="cx-header-title">Caddxpert AI Advisor</span>
             <div class="cx-header-status">
