@@ -342,7 +342,12 @@
       <button class="cx-launcher" id="cxLauncher">
         <div class="cx-badge"></div>
         <svg class="cx-icon-chat" viewBox="0 0 24 24">
-          <path d="M20,2H4C2.9,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.2L4,17.2V4h16V16z M7,9h10v2H7V9z M7,5h10v2H7V5z M7,13h7v2H7V13z"/>
+          <!-- Antenna ball -->
+          <circle cx="12" cy="2" r="1.1"/>
+          <!-- Antenna stem -->
+          <rect x="11.3" y="3.1" width="1.4" height="2"/>
+          <!-- Robot face + speech bubble tail; eyes & smile are holes via evenodd -->
+          <path fill-rule="evenodd" d="M18.5,5 L5.5,5 Q3,5,3,7.5 L3,14.5 Q3,17,5.5,17 L9.5,17 L12,20.5 L14.5,17 L18.5,17 Q21,17,21,14.5 L21,7.5 Q21,5,18.5,5 Z M11.2,8 Q11.2,7.2,10.4,7.2 L8.6,7.2 Q7.8,7.2,7.8,8 L7.8,11.5 Q7.8,12.3,8.6,12.3 L10.4,12.3 Q11.2,12.3,11.2,11.5 Z M16.2,8 Q16.2,7.2,15.4,7.2 L13.6,7.2 Q12.8,7.2,12.8,8 L12.8,11.5 Q12.8,12.3,13.6,12.3 L15.4,12.3 Q16.2,12.3,16.2,11.5 Z M8.5,13.5 Q12,16.2,15.5,13.5 L15.5,14.1 Q12,16.7,8.5,14.1 Z"/>
         </svg>
         <svg class="cx-icon-close" viewBox="0 0 24 24">
           <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
