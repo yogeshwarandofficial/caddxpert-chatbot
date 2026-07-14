@@ -74,18 +74,31 @@
       width: 100%;
       text-align: center;
     }
+    .note-success {
+      background: rgba(39,201,63,0.1);
+      border: 1px solid rgba(39,201,63,0.3);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #6ee7b7;
+      margin-bottom: 24px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <h1>Widget Local Test</h1>
-  <p class="subtitle">This page loads widget.js from <strong>localhost</strong> for local testing.</p>
+  <p class="subtitle">This page loads widget.js from <strong>localhost:3000</strong> for local testing.</p>
 
-  <div class="note">⚠️ This page uses the LOCAL widget.js — not the CDN version.</div>
+  <div class="note">⚠️ Open this page via <strong>http://localhost:3000/local-test.html</strong> — not as a file://</div>
+  <div class="note-success" id="cxServerStatus">✅ Widget loaded from local server on port 3000</div>
 
   <div class="card">
     <div class="card-title">Local embed snippet</div>
-    <pre>&lt;script src="/widget.js" data-api=""&gt;&lt;/script&gt;</pre>
+    <pre>&lt;script src="/widget.js" data-api="http://localhost:3000"&gt;&lt;/script&gt;</pre>
   </div>
 
   <footer>
@@ -93,8 +106,8 @@
     &nbsp;·&nbsp; Powered by CAD Point, Thiruvarur
   </footer>
 
-  <!-- ✅ LOCAL widget.js -->
-  <script src="/widget.js" data-api=""></script>
+  <!-- ✅ LOCAL widget.js — served by Express on http://localhost:3000 -->
+  <script src="/widget.js" data-api="http://localhost:3000"></script>
 
 </body>
 </html>
