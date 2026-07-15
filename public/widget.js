@@ -317,7 +317,7 @@
 
     /* Mobile-only adjustments (font sizes only — layout handled by JS) */
     @media (max-width: 640px) {
-      .cx-widget-container { bottom: 16px; right: 16px; }
+      .cx-widget-container { bottom: 16px; right: 5px; }
       .cx-launcher { width: 54px; height: 54px; }
       .cx-launcher-tooltip { display: none; }
       .cx-header { padding: 12px 16px; }
