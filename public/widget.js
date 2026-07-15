@@ -33,6 +33,19 @@
       font-family: 'Inter', sans-serif;
     }
 
+    /* Ping ring behind launcher */
+    .cx-ping {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--cx-red);
+      opacity: 0.35;
+      animation: cx-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .cx-launcher.open .cx-ping { animation: none; opacity: 0; }
+
     /* Launcher bubble */
     .cx-launcher {
       width: 60px;
@@ -314,6 +327,11 @@
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    @keyframes cx-ping {
+      0%   { transform: scale(1);   opacity: 0.35; }
+      80%  { transform: scale(1.9); opacity: 0; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
 
     /* Mobile-only adjustments (font sizes only — layout handled by JS) */
     @media (max-width: 640px) {
@@ -343,6 +361,7 @@
         Ask Caddxpert AI Advisor
       </div>
       <button class="cx-launcher" id="cxLauncher">
+        <span class="cx-ping"></span>
         <div class="cx-badge"></div>
         <svg class="cx-icon-chat" viewBox="0 0 24 24">
           <!-- Antenna ball -->
