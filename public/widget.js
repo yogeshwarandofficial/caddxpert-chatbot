@@ -390,7 +390,7 @@
     <div class="cx-chat-panel" id="cxPanel">
       <div class="cx-header">
         <div class="cx-header-info">
-          <div class="cx-header-avatar"><img src="/cx-logo.png" alt="CX Logo" onerror="this.parentNode.innerHTML='CX'"/></div>
+          <div class="cx-header-avatar"><img src="${BASE_URL}/cx-logo.png" alt="CX Logo" onerror="this.parentNode.innerHTML='CX'"/></div>
           <div class="cx-header-meta">
             <span class="cx-header-title">Caddxpert AI Advisor</span>
             <div class="cx-header-status">
