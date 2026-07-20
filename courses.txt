@@ -1,0 +1,489 @@
+[
+  {
+    "category": "Software Development",
+    "course_title": "Java",
+    "subtitle": "Core Java Programming",
+    "course_overview": "An introduction to object-oriented programming using Java, covering basic syntax, data types, control flow, classes, objects, and foundational libraries.",
+    "what_you_will_learn": [
+      "Java Syntax and Basics",
+      "Object-Oriented Programming (OOP) Concepts",
+      "Control Flow Statements",
+      "Arrays and Strings",
+      "Exception Handling",
+      "Basic I/O Operations"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "Advanced Java",
+    "subtitle": "Enterprise Application Development",
+    "course_overview": "Builds upon Core Java to develop web applications and enterprise solutions using technologies like Servlets, JSP, JDBC, and popular frameworks.",
+    "what_you_will_learn": [
+      "JDBC (Java Database Connectivity)",
+      "Servlets",
+      "JSP (JavaServer Pages)",
+      "Introduction to Spring/Hibernate Frameworks",
+      "Web Services (REST/SOAP)",
+      "Multithreading and Concurrency"
+    ],
+    "duration": "3 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "C Programming",
+    "subtitle": "Foundational System Programming",
+    "course_overview": "Learn the fundamentals of procedural programming with C, a powerful systems language, covering memory management, pointers, and data structures.",
+    "what_you_will_learn": [
+      "C Basics and Syntax",
+      "Functions and Scope",
+      "Pointers and Memory Management",
+      "Arrays and Strings",
+      "Structures and Unions",
+      "File I/O Operations"
+    ],
+    "duration": "1.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "C++ Programming",
+    "subtitle": "Object-Oriented C++",
+    "course_overview": "Extends C programming with object-oriented features, focusing on classes, inheritance, polymorphism, and the Standard Template Library (STL).",
+    "what_you_will_learn": [
+      "C++ Basics and Syntax",
+      "Object-Oriented Programming (OOP) in C++",
+      "Classes and Objects",
+      "Inheritance and Polymorphism",
+      "Templates and Exceptions",
+      "Standard Template Library (STL)"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "Python",
+    "subtitle": "Versatile Programming for Web, Data, and Automation",
+    "course_overview": "A comprehensive guide to Python programming, covering basic syntax, data structures, scripting, and introductory libraries for various applications.",
+    "what_you_will_learn": [
+      "Python Basics and Syntax",
+      "Data Structures (Lists, Dictionaries, Sets, Tuples)",
+      "Functions and Modules",
+      "Object-Oriented Programming in Python",
+      "File Handling",
+      "Introduction to Libraries (NumPy, Pandas basic)"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "Full Stack Development - MEAN / MERN stack",
+    "subtitle": "End-to-End Web Development",
+    "course_overview": "Master the art of building complete web applications from frontend to backend using JavaScript-based technologies (MongoDB, Express, Angular/React, Node.js).",
+    "what_you_will_learn": [
+      "HTML, CSS, JavaScript (ES6+)",
+      "Frontend Framework (React or Angular)",
+      "Backend Framework (Node.js & Express.js)",
+      "Database Management (MongoDB)",
+      "RESTful API Development",
+      "Deployment and Hosting"
+    ],
+    "duration": "4-6 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "Django",
+    "subtitle": "Python Web Framework",
+    "course_overview": "Learn to build robust and scalable web applications rapidly using Django, a high-level Python web framework that encourages clean, pragmatic design.",
+    "what_you_will_learn": [
+      "Django Basics and Architecture (MVT)",
+      "Models and Database Migrations",
+      "Views and URL Routing",
+      "Templates and Forms",
+      "Authentication and Authorization",
+      "Building REST APIs with Django REST Framework"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "Android App Development using KOTLIN",
+    "subtitle": "Modern Android Development",
+    "course_overview": "Develop native Android applications using Kotlin, the preferred language for Android, covering UI design, data storage, and integrating with web services.",
+    "what_you_will_learn": [
+      "Kotlin Basics",
+      "Android Studio and Setup",
+      "UI/UX Design with XML/Jetpack Compose",
+      "Activities and Fragments",
+      "Data Storage (Room Database)",
+      "Networking and API Integration (Retrofit)"
+    ],
+    "duration": "3 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Software Development",
+    "course_title": "ASP.net with C#",
+    "subtitle": "Microsoft Web Application Development",
+    "course_overview": "Learn to build dynamic web sites, applications and services using the ASP.NET framework and C# programming language.",
+    "what_you_will_learn": [
+      "C# Programming Basics",
+      "ASP.NET Core Architecture",
+      "MVC (Model-View-Controller) Pattern",
+      "Entity Framework Core for Data Access",
+      "Building Web APIs",
+      "Authentication and Security"
+    ],
+    "duration": "3 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  }
+]
+
+
+[
+  {
+    "category": "Special Programs",
+    "course_title": "Data Science",
+    "subtitle": "Comprehensive Data Analysis & Modeling",
+    "course_overview": "A foundational course covering the end-to-end data science lifecycle, from data wrangling and visualization to statistical modeling and predictive analytics.",
+    "what_you_will_learn": [
+      "Data Exploration and Preprocessing",
+      "Statistical Analysis",
+      "Data Visualization Techniques",
+      "Predictive Modeling",
+      "Model Evaluation Metrics",
+      "Data Storytelling"
+    ],
+    "duration": "3 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Data Science & Data Engineering using Python",
+    "subtitle": "Building Robust Data Pipelines",
+    "course_overview": "Combines data science methodologies with engineering practices, focusing on building scalable data infrastructure and deploying models using Python.",
+    "what_you_will_learn": [
+      "Python for Data Science (Pandas, NumPy)",
+      "ETL (Extract, Transform, Load) Processes",
+      "Database Management (SQL/NoSQL)",
+      "Big Data Concepts (Hadoop/Spark basics)",
+      "Data Pipeline Orchestration",
+      "Model Deployment"
+    ],
+    "duration": "4 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Data Science using R",
+    "subtitle": "Statistical Computing & Graphics",
+    "course_overview": "Focuses on utilizing the R programming language for in-depth statistical analysis, advanced data visualization, and building predictive models.",
+    "what_you_will_learn": [
+      "R Programming Fundamentals",
+      "Data Manipulation with dplyr",
+      "Data Visualization with ggplot2",
+      "Statistical Modeling in R",
+      "Time Series Analysis",
+      "Creating R Markdown Reports"
+    ],
+    "duration": "2.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Data Analytics using Power BI",
+    "subtitle": "Business Intelligence & Dashboards",
+    "course_overview": "Learn to transform raw data into actionable insights using Microsoft Power BI, focusing on data connectivity, DAX expressions, and interactive dashboards.",
+    "what_you_will_learn": [
+      "Connecting to Data Sources",
+      "Data Transformation in Power Query",
+      "Data Modeling",
+      "DAX (Data Analysis Expressions)",
+      "Creating Interactive Reports and Dashboards",
+      "Publishing and Sharing in Power BI Service"
+    ],
+    "duration": "1.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Machine Learning",
+    "subtitle": "Algorithms and Predictive Analytics",
+    "course_overview": "Delve into the core concepts and algorithms of Machine Learning, enabling systems to learn from data and improve performance without explicit programming.",
+    "what_you_will_learn": [
+      "Supervised Learning (Regression, Classification)",
+      "Unsupervised Learning (Clustering, Dimensionality Reduction)",
+      "Ensemble Methods (Random Forest, Gradient Boosting)",
+      "Model Selection and Hyperparameter Tuning",
+      "Handling Imbalanced Data",
+      "Feature Engineering"
+    ],
+    "duration": "3 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Machine Learning using Python",
+    "subtitle": "Applied ML with Scikit-Learn",
+    "course_overview": "A hands-on approach to implementing Machine Learning algorithms using Python and its powerful libraries like Scikit-Learn to solve real-world problems.",
+    "what_you_will_learn": [
+      "Python ML Libraries Overview (Scikit-Learn)",
+      "Implementing Regression Models",
+      "Implementing Classification Models",
+      "Clustering Techniques in Python",
+      "Building ML Pipelines",
+      "Evaluating Model Performance"
+    ],
+    "duration": "2.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Machine Learning using R",
+    "subtitle": "Statistical ML Implementation",
+    "course_overview": "Learn to apply machine learning algorithms using R, leveraging its strong statistical packages for rigorous model building and analysis.",
+    "what_you_will_learn": [
+      "R Packages for ML (caret, mlr)",
+      "Linear and Logistic Regression in R",
+      "Decision Trees and Random Forests",
+      "Support Vector Machines",
+      "Cross-Validation Techniques",
+      "Model Interpretability"
+    ],
+    "duration": "2.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Blockchain",
+    "subtitle": "Decentralized Ledger Technology",
+    "course_overview": "Understand the fundamentals of blockchain technology, cryptography, consensus mechanisms, and the development of smart contracts and decentralized applications (DApps).",
+    "what_you_will_learn": [
+      "Cryptography Basics (Hashing, Public Key Infrastructure)",
+      "Blockchain Architecture and Consensus",
+      "Ethereum Fundamentals",
+      "Solidity Programming",
+      "Developing Smart Contracts",
+      "Building DApps (Decentralized Applications)"
+    ],
+    "duration": "3 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Artificial Intelligence",
+    "subtitle": "Foundations of AI & Deep Learning",
+    "course_overview": "Explore the broader field of Artificial Intelligence, focusing on advanced concepts like neural networks, deep learning, computer vision, and natural language processing.",
+    "what_you_will_learn": [
+      "Introduction to Neural Networks",
+      "Deep Learning Frameworks (TensorFlow/PyTorch)",
+      "Convolutional Neural Networks (CNNs)",
+      "Recurrent Neural Networks (RNNs)",
+      "Computer Vision Basics",
+      "Introduction to Natural Language Processing"
+    ],
+    "duration": "4 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Robotic Process Automation (RPA)",
+    "subtitle": "Automating Business Workflows",
+    "course_overview": "Learn to design and deploy software robots to automate repetitive, rule-based business processes using industry-leading RPA tools.",
+    "what_you_will_learn": [
+      "RPA Concepts and Architecture",
+      "Introduction to RPA Tools (UiPath/Automation Anywhere)",
+      "Workflow Design and Automation",
+      "Data Scraping and Manipulation",
+      "Exception Handling in Bots",
+      "Deploying and Managing Bots"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Robotics",
+    "subtitle": "Hardware and Control Systems",
+    "course_overview": "An interdisciplinary course covering the design, construction, operation, and use of robots, including sensors, actuators, and basic control programming.",
+    "what_you_will_learn": [
+      "Robotics Kinematics and Dynamics",
+      "Sensors and Perception",
+      "Actuators and Motor Control",
+      "Microcontroller Programming (e.g., Arduino, Raspberry Pi)",
+      "Robot Operating System (ROS) Basics",
+      "Basic Autonomous Navigation"
+    ],
+    "duration": "3.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Internet of Things (IoT)",
+    "subtitle": "Connecting Devices and Systems",
+    "course_overview": "Learn how to build IoT systems by connecting physical devices to the internet, collecting data via sensors, and analyzing it using cloud platforms.",
+    "what_you_will_learn": [
+      "IoT Architecture and Protocols (MQTT, CoAP)",
+      "Working with Microcontrollers and Sensors",
+      "Edge Computing Basics",
+      "Cloud Integration for IoT (AWS/Azure IoT)",
+      "Data Collection and Analytics",
+      "IoT Security Fundamentals"
+    ],
+    "duration": "3 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Complete guide to NLP Chat GPT",
+    "subtitle": "Generative AI and Prompt Engineering",
+    "course_overview": "Master Natural Language Processing concepts and learn to effectively utilize and integrate Large Language Models (LLMs) like ChatGPT into applications.",
+    "what_you_will_learn": [
+      "NLP Fundamentals (Tokenization, Embeddings)",
+      "Introduction to Transformer Models",
+      "Working with the OpenAI API",
+      "Advanced Prompt Engineering Techniques",
+      "Fine-tuning Concepts",
+      "Building AI Chatbots and Agents"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Special Programs",
+    "course_title": "Fundamentals of Additive Manufacturing using 3D Printing",
+    "subtitle": "From CAD to Physical Object",
+    "course_overview": "Discover the principles of 3D printing technologies, material science, and the software workflows required to prepare and execute successful 3D prints.",
+    "what_you_will_learn": [
+      "Types of 3D Printing Technologies (FDM, SLA, etc.)",
+      "3D Printing Materials and Properties",
+      "CAD Design for Additive Manufacturing",
+      "Slicing Software and Parameter Optimization",
+      "Printer Operation and Maintenance",
+      "Post-Processing Techniques"
+    ],
+    "duration": "1.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  }
+]
+[
+  {
+    "category": "Industrial Automation",
+    "course_title": "PLC & SCADA",
+    "subtitle": "Programmable Logic Controllers and Supervisory Control",
+    "course_overview": "Equips students with the practical skills needed to design, program, and maintain automated industrial systems using PLCs and SCADA software.",
+    "what_you_will_learn": [
+      "Introduction to Industrial Automation",
+      "PLC Hardware and Architecture",
+      "Ladder Logic Programming Basics",
+      "Advanced PLC Instructions and Timers",
+      "SCADA System Design and Configuration",
+      "HMI (Human-Machine Interface) Integration"
+    ],
+    "duration": "2.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Industrial Automation",
+    "course_title": "Electrical Power System Analysis",
+    "subtitle": "Modeling and Simulation of Power Grids",
+    "course_overview": "Focuses on the theoretical and practical aspects of analyzing electrical power systems, including fault analysis, load flow, and stability studies.",
+    "what_you_will_learn": [
+      "Power System Components Modeling",
+      "Load Flow Analysis (Newton-Raphson, Gauss-Seidel)",
+      "Symmetrical and Unsymmetrical Fault Analysis",
+      "Transient Stability Studies",
+      "Using Power System Simulation Software (e.g., ETAP, MATLAB)",
+      "Protection Coordination Basics"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  }
+]
+```eof
+
+```json:electronic_design_automation_courses.json
+[
+  {
+    "category": "Electronic Design Automation",
+    "course_title": "MATLAB",
+    "subtitle": "Technical Computing and Simulation",
+    "course_overview": "Learn to utilize MATLAB for mathematical computation, algorithm development, data analysis, and system simulation across various engineering disciplines.",
+    "what_you_will_learn": [
+      "MATLAB Workspace and Syntax",
+      "Matrix and Array Operations",
+      "Data Visualization (2D and 3D Plotting)",
+      "Programming Scripts and Functions",
+      "Introduction to Simulink for System Modeling",
+      "Solving Ordinary Differential Equations"
+    ],
+    "duration": "1.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Electronic Design Automation",
+    "course_title": "Microcontroller",
+    "subtitle": "Embedded Systems Fundamentals",
+    "course_overview": "Gain a solid foundation in embedded systems by learning the architecture, programming, and interfacing of basic microcontrollers (e.g., 8051 or PIC).",
+    "what_you_will_learn": [
+      "Microcontroller Architecture and Pin Diagram",
+      "Embedded C Programming Basics",
+      "I/O Port Programming",
+      "Timers and Counters",
+      "Interrupt Handling",
+      "Interfacing LEDs, LCDs, and Keypads"
+    ],
+    "duration": "2 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  },
+  {
+    "category": "Electronic Design Automation",
+    "course_title": "Advanced Microcontroller",
+    "subtitle": "ARM Cortex and Advanced Embedded Systems",
+    "course_overview": "Deep dive into advanced microcontroller architectures like ARM Cortex-M, focusing on real-time operating systems (RTOS) and complex peripheral interfacing.",
+    "what_you_will_learn": [
+      "ARM Architecture and Instruction Set",
+      "Advanced Peripheral Configuration (ADC, DAC, PWM)",
+      "Communication Protocols (I2C, SPI, UART, CAN)",
+      "Introduction to Real-Time Operating Systems (RTOS)",
+      "Task Scheduling and Resource Management",
+      "Developing IoT Applications with Advanced MCUs"
+    ],
+    "duration": "2.5 Months",
+    "mode": "Offline / Online",
+    "placement": "100% Assistance"
+  }
+]
